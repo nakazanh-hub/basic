@@ -1,0 +1,1400 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>2次方程式・2次不等式 学習アプリ</title>
+  <!-- MathJax JS for Math Rendering -->
+  <script>
+    MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']]
+      },
+      svg: {
+        fontCache: 'global'
+      }
+    };
+  </script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+  
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', Meiryo, sans-serif;
+      background-color: #f4f7f6;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      padding: 20px;
+    }
+
+    .quiz-container {
+      background: white;
+      padding: 40px;
+      border-radius: 16px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+      width: 95%;
+      max-width: 1200px;
+      min-height: 85vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      text-align: center;
+      transition: all 0.3s ease;
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+    }
+
+    .quiz-container.split-layout {
+      max-width: 98vw;
+      width: 98vw;
+      padding: 20px;
+      min-height: auto;
+      height: auto;
+      justify-content: flex-start;
+      overflow-y: auto;
+    }
+
+    .split-wrapper {
+      display: flex;
+      flex-direction: row;
+      gap: 20px;
+      width: 100%;
+      height: 100%;
+      text-align: left;
+    }
+
+    .split-left {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+
+    .split-right {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      background: #fff;
+      border: 2px solid #ced4da;
+      border-radius: 12px;
+      overflow: hidden;
+      min-width: 0;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    }
+
+    @media (max-width: 1024px) {
+      body {
+        padding: 10px;
+        align-items: flex-start;
+      }
+      .quiz-container {
+        padding: 20px;
+        min-height: auto;
+      }
+      .quiz-container.split-layout {
+        max-width: 100%;
+        width: 100%;
+        padding: 15px;
+      }
+      .split-wrapper {
+        flex-direction: column;
+      }
+      .split-right {
+        height: 380px;
+        flex-shrink: 0;
+      }
+    }
+
+    .app-title { font-size: 32px; font-weight: bold; color: #2c3e50; margin-bottom: 12px; }
+    .app-subtitle { font-size: 18px; color: #6c757d; margin-bottom: 28px; }
+
+    .user-info-form { display: flex; flex-direction: column; gap: 18px; text-align: left; max-width: 600px; margin: 0 auto; width: 100%; }
+    .form-group-inline { display: flex; gap: 12px; }
+    .form-group-inline > div { flex: 1; }
+    .user-info-form label { font-size: 15px; font-weight: bold; color: #495057; display: block; margin-bottom: 6px; }
+    .user-info-form input, .user-info-form select { 
+      width: 100%; 
+      padding: 12px 14px; 
+      border: 1px solid #ced4da; 
+      border-radius: 8px; 
+      font-size: 18px; 
+      background-color: #fff;
+    }
+
+    .user-display-bar {
+      background-color: #eef6ff;
+      padding: 12px 20px;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: bold;
+      color: #007bff;
+      margin-bottom: 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .btn-edit-user { background: none; border: none; color: #6c757d; font-size: 14px; cursor: pointer; text-decoration: underline; }
+
+    .menu-section-title {
+      font-size: 20px;
+      font-weight: bold;
+      color: #343a40;
+      text-align: left;
+      margin: 24px 0 12px 0;
+      padding-left: 10px;
+      border-left: 5px solid #007bff;
+    }
+
+    .menu-list {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+    .menu-card {
+      background: #f8f9fa;
+      border: 2px solid #e9ecef;
+      border-radius: 12px;
+      padding: 20px 24px;
+      text-align: left;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .menu-card:hover {
+      background: #eef6ff;
+      border-color: #007bff;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 123, 255, 0.15);
+    }
+
+    .menu-card-title {
+      font-size: 20px;
+      font-weight: bold;
+      color: #2c3e50;
+    }
+    .menu-card-stats { text-align: right; display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
+    .menu-card-badge {
+      background: #007bff;
+      color: white;
+      font-size: 13px;
+      font-weight: bold;
+      padding: 4px 12px;
+      border-radius: 12px;
+      white-space: nowrap;
+    }
+    .menu-card-accuracy { font-size: 15px; font-weight: bold; color: #28a745; }
+
+    .quiz-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    .header-controls {
+      display: flex;
+      gap: 10px;
+    }
+    .question-number {
+      font-size: 18px;
+      color: #6c757d;
+      font-weight: 600;
+    }
+    .btn-small-menu {
+      background: #e9ecef;
+      color: #495057;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+    .btn-small-menu:hover { background: #dee2e6; }
+    
+    .btn-memo {
+      background: #17a2b8;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+    .btn-memo:hover { background: #138496; }
+    .btn-memo.active { background: #e0a800; color: #212529; }
+
+    .question-content {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      margin-bottom: 24px;
+    }
+
+    .question-title {
+      flex: 1;
+      text-align: left !important;
+      font-size: 22px;
+      font-weight: bold;
+      color: #2c3e50;
+      line-height: 1.8;
+      word-break: break-word;
+    }
+
+    .options-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    @media (max-width: 600px) {
+      .options-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+    .btn-option {
+      background-color: #f8f9fa;
+      border: 2px solid #e9ecef;
+      border-radius: 12px;
+      padding: 16px;
+      font-size: 18px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      color: #333;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 60px;
+      line-height: 1.4;
+    }
+    .btn-option:hover:not(:disabled) {
+      background-color: #e9ecef;
+      border-color: #4a90e2;
+    }
+    .btn-option:disabled {
+      cursor: default;
+      opacity: 0.85;
+    }
+    
+    .btn-option.correct-choice {
+      background-color: #d4edda !important;
+      border-color: #c3e6cb !important;
+      color: #155724 !important;
+    }
+    .btn-option.wrong-choice {
+      background-color: #f8d7da !important;
+      border-color: #f5c6cb !important;
+      color: #721c24 !important;
+    }
+
+    .result-section {
+      margin-top: 16px;
+      display: none;
+      text-align: left;
+      background-color: #f8f9fa;
+      padding: 20px;
+      border-radius: 12px;
+      border: 1px solid #e2e8f0;
+    }
+    .result-header {
+      font-size: 24px;
+      font-weight: bold;
+      margin-bottom: 12px;
+      text-align: center;
+    }
+    .correct { color: #28a745; }
+    .incorrect { color: #dc3545; }
+    
+    .explanation-box {
+      font-size: 16px;
+      color: #495057;
+      line-height: 1.8;
+    }
+    .explanation-title {
+      font-weight: bold;
+      color: #2c3e50;
+      margin-bottom: 8px;
+      border-bottom: 2px solid #007bff;
+      display: inline-block;
+      padding-bottom: 4px;
+    }
+
+    .reflection-box {
+      background: #f8f9fa;
+      border: 2px solid #e0e0e0;
+      border-radius: 12px;
+      padding: 20px;
+      margin: 20px 0;
+      text-align: left;
+    }
+    .reflection-title {
+      font-size: 18px;
+      font-weight: bold;
+      color: #2c3e50;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .reflection-rating {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+    .btn-rating {
+      flex: 1;
+      padding: 10px 4px;
+      border: 2px solid #ced4da;
+      background: #fff;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+      font-size: 14px;
+      color: #495057;
+      transition: all 0.2s ease;
+    }
+    .btn-rating:hover {
+      border-color: #007bff;
+      background: #eef6ff;
+    }
+    .btn-rating.selected {
+      background: #007bff;
+      color: white;
+      border-color: #007bff;
+    }
+    .reflection-textarea {
+      width: 100%;
+      height: 90px;
+      padding: 12px;
+      border: 1px solid #ced4da;
+      border-radius: 8px;
+      font-size: 15px;
+      resize: vertical;
+      font-family: inherit;
+    }
+    
+    .send-status { font-size: 15px; margin-top: 15px; color: #007bff; font-weight: bold; text-align: center; }
+
+    .btn-primary {
+      background-color: #007bff;
+      color: white;
+      border: none;
+      padding: 16px 32px;
+      border-radius: 8px;
+      font-size: 18px;
+      font-weight: bold;
+      cursor: pointer;
+      margin-top: 20px;
+      display: block;
+      transition: background-color 0.2s;
+      width: 100%;
+    }
+    .btn-primary:hover { background-color: #0056b3; }
+    
+    .btn-secondary {
+      background-color: #6c757d;
+      color: white;
+      border: none;
+      padding: 16px 32px;
+      border-radius: 8px;
+      font-size: 18px;
+      font-weight: bold;
+      cursor: pointer;
+      margin-top: 12px;
+      display: block;
+      transition: background-color 0.2s;
+      width: 100%;
+    }
+    .btn-secondary:hover { background-color: #5a6268; }
+
+    .btn-danger {
+      background-color: #dc3545;
+      color: white;
+      border: none;
+      padding: 14px 28px;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      margin-top: 12px;
+      display: block;
+      transition: background-color 0.2s;
+      width: 100%;
+    }
+    .btn-danger:hover { background-color: #c82333; }
+
+    .memo-header {
+      padding: 10px 16px;
+      background: #2c3e50;
+      color: white;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .memo-title { font-weight: bold; font-size: 16px; }
+    .memo-toolbar {
+      padding: 8px;
+      background: #f1f3f5;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+      border-bottom: 1px solid #dee2e6;
+    }
+    .memo-toolbar button, .memo-toolbar select, .memo-toolbar input {
+      padding: 4px 8px;
+      border-radius: 6px;
+      border: 1px solid #ced4da;
+      background: white;
+      font-size: 13px;
+      cursor: pointer;
+    }
+    .memo-toolbar button.active {
+      background: #007bff;
+      color: white;
+      border-color: #007bff;
+    }
+    .memo-canvas-wrapper {
+      flex: 1;
+      position: relative;
+      background: #fdfdfd;
+      background-image: linear-gradient(#e5e5e5 1px, transparent 1px), linear-gradient(90deg, #e5e5e5 1px, transparent 1px);
+      background-size: 20px 20px;
+      touch-action: none;
+      min-height: 250px;
+    }
+    canvas#memo-canvas {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      cursor: crosshair; 
+    }
+  </style>
+</head>
+<body>
+
+<div class="quiz-container" id="main-container">
+  
+  <!-- 0. ユーザー情報入力画面 -->
+  <div id="user-info-box">
+    <div class="app-title">📝 初期設定</div>
+    <div class="app-subtitle">学習を開始する前に名前を入力してください</div>
+    
+    <form class="user-info-form" onsubmit="saveUserInfo(event)">
+      <div class="form-group-inline">
+        <div>
+          <label for="input-grade">年</label>
+          <select id="input-grade" required>
+            <option value="">選択</option>
+          </select>
+        </div>
+        <div>
+          <label for="input-class">組</label>
+          <select id="input-class" required>
+            <option value="">選択</option>
+          </select>
+        </div>
+        <div>
+          <label for="input-number">番号</label>
+          <select id="input-number" required>
+            <option value="">選択</option>
+          </select>
+        </div>
+      </div>
+      <div>
+        <label for="input-name">氏名</label>
+        <input type="text" id="input-name" placeholder="山田 太郎" required>
+      </div>
+      <button type="submit" class="btn-primary">学習を開始する</button>
+      <button type="button" class="btn-danger" onclick="resetAllData()">🔄 ユーザー情報・全解答履歴をリセット</button>
+    </form>
+  </div>
+
+  <!-- 1. メニュー画面 -->
+  <div id="menu-box" style="display: none;">
+    <div class="user-display-bar">
+      <span id="user-display-text"></span>
+      <button class="btn-edit-user" onclick="showUserInfoForm()">設定変更</button>
+    </div>
+    <div class="app-title">📐 2次方程式・2次不等式 トレーニング</div>
+    <div class="app-subtitle">挑戦したい問題セットを選択してください</div>
+    
+    <div class="menu-section-title">📘 演習問題セット</div>
+    <div class="menu-list" id="menu-basic-container"></div>
+  </div>
+
+  <!-- 2. クイズ画面 -->
+  <div id="quiz-box" style="display: none;">
+    <div class="quiz-header">
+      <div class="question-number" id="q-num">第 1 問</div>
+      <div class="header-controls">
+        <button class="btn-memo" id="memo-toggle-btn" onclick="toggleMemoLayout()">✏️ 計算メモを表示</button>
+        <button class="btn-small-menu" onclick="showMenu()">メニューに戻る</button>
+      </div>
+    </div>
+
+    <div class="split-wrapper">
+      <div class="split-left">
+        <div class="question-content">
+          <div class="question-title" id="q-title">問題の読み込み中...</div>
+        </div>
+        
+        <!-- 選択肢型領域 -->
+        <div class="options-grid" id="options-container"></div>
+
+        <div class="result-section" id="result-section">
+          <div class="result-header" id="result-text"></div>
+          <div class="explanation-box">
+            <div class="explanation-title">解説</div>
+            <div id="explanation-text"></div>
+          </div>
+          <button class="btn-primary" id="next-btn" onclick="nextQuestion()">次の問題へ</button>
+        </div>
+      </div>
+
+      <div class="split-right" id="memo-panel" style="display: none;">
+        <div class="memo-header">
+          <span class="memo-title">✏️ 計算スペース</span>
+        </div>
+        <div class="memo-toolbar">
+          <button id="tool-pen" class="active" onclick="setMemoMode('pen')">🖊️ ペン</button>
+          <button id="tool-eraser" onclick="setMemoMode('eraser')">🧹 消しゴム</button>
+          <label style="font-size: 12px;">色:
+            <input type="color" id="memo-color" value="#000000" onchange="updateMemoStyle()">
+          </label>
+          <label style="font-size: 12px;">太さ:
+            <select id="memo-size" onchange="updateMemoStyle()">
+              <option value="2">細い</option>
+              <option value="4" selected>普通</option>
+              <option value="8">太い</option>
+            </select>
+          </label>
+          <button onclick="clearMemoCanvas()" style="margin-left: auto; background-color: #f8d7da; color: #721c24;">🗑️ 全消去</button>
+        </div>
+        <div class="memo-canvas-wrapper" id="memo-canvas-wrapper">
+          <canvas id="memo-canvas"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. 結果発表画面 -->
+  <div id="score-box" style="display: none;">
+    <h2 style="color: #2c3e50; margin-top: 0;" id="score-title">🎉 全問終了 🎉</h2>
+    <div id="score-text" style="font-size: 26px; font-weight: bold; color: #007bff; margin: 20px 0 10px 0;"></div>
+    <div id="accuracy-text" style="font-size: 22px; font-weight: bold; color: #28a745; margin-bottom: 10px;"></div>
+    <div id="details-text" style="font-size: 20px; font-weight: bold; color: #495057; margin-bottom: 20px; letter-spacing: 2px;"></div>
+
+    <div class="reflection-box">
+      <div class="reflection-title">💭 学習の振り返り</div>
+      
+      <label style="font-size: 14px; font-weight: bold; color: #495057; display: block; margin-bottom: 8px;">1. 理解度を選んでください</label>
+      <div class="reflection-rating">
+        <button type="button" class="btn-rating" onclick="setRating(1, this)">1: 難しかった</button>
+        <button type="button" class="btn-rating" onclick="setRating(2, this)">2: 少し難しい</button>
+        <button type="button" class="btn-rating" onclick="setRating(3, this)">3: 普通</button>
+        <button type="button" class="btn-rating" onclick="setRating(4, this)">4: よく分かった</button>
+        <button type="button" class="btn-rating" onclick="setRating(5, this)">5: 完璧！</button>
+      </div>
+
+      <label for="reflection-comment" style="font-size: 14px; font-weight: bold; color: #495057; display: block; margin-bottom: 8px;">2. わかったこと・疑問点・感想などを自由に記入してください</label>
+      <textarea id="reflection-comment" class="reflection-textarea" placeholder="例：因数分解や解の公式を使った2次方程式・不等式の解き方がよく理解できた。"></textarea>
+    </div>
+
+    <div class="send-status" id="send-status" style="display: none;"></div>
+
+    <div style="margin-top: 24px; max-width: 500px; margin-left: auto; margin-right: auto;">
+      <button class="btn-secondary" onclick="restartQuiz()">もう一度解く</button>
+      <button class="btn-secondary" onclick="showMenu()">メニュー画面に戻る</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  // 最新のGAS Web App URL
+  const GAS_WEBAPP_URL = "https://script.google.com/macros/s/AKfycbxCAZTdgVacS5BXel_gHEAl3Y_of6VDSfa6OyZXl_7dSi-qV5vlEZmB8zSNasWoBPO-Bw/exec";
+
+  const quizSets = [
+    {
+      id: "set-104-105",
+      title: "【問題1】問題104・105：2次方程式（因数分解）",
+      questions: [
+        {
+          text: "【104(1)】 次の2次方程式を解きなさい。<br>$x^2 - 9x = 0$",
+          correct: "$x = 0, 9$",
+          dummy: ["$x = 0, -9$", "$x = 3, -3$", "$x = 9$"],
+          explanation: "$x(x - 9) = 0$ より、$x = 0$ または $x - 9 = 0$<br>よって、$x = 0, 9$"
+        },
+        {
+          text: "【104(2)】 次の2次方程式を解きなさい。<br>$x^2 + 3x = 0$",
+          correct: "$x = 0, -3$",
+          dummy: ["$x = 0, 3$", "$x = 3$", "$x = -3$"],
+          explanation: "$x(x + 3) = 0$ より、$x = 0$ または $x + 3 = 0$<br>よって、$x = 0, -3$"
+        },
+        {
+          text: "【104(3)】 次の2次方程式を解きなさい。<br>$x^2 - 7x + 10 = 0$",
+          correct: "$x = 2, 5$",
+          dummy: ["$x = -2, -5$", "$x = -2, 5$", "$x = 2, -5$"],
+          explanation: "$(x - 2)(x - 5) = 0$ より、$x = 2, 5$"
+        },
+        {
+          text: "【104(4)】 次の2次方程式を解きなさい。<br>$x^2 + 2x - 15 = 0$",
+          correct: "$x = 3, -5$",
+          dummy: ["$x = -3, 5$", "$x = 3, 5$", "$x = -3, -5$"],
+          explanation: "$(x - 3)(x + 5) = 0$ より、$x = 3, -5$"
+        },
+        {
+          text: "【104(5)】 次の2次方程式を解きなさい。<br>$x^2 - 6x - 16 = 0$",
+          correct: "$x = 8, -2$",
+          dummy: ["$x = -8, 2$", "$x = 4, -4$", "$x = 8, 2$"],
+          explanation: "$(x - 8)(x + 2) = 0$ より、$x = 8, -2$"
+        },
+        {
+          text: "【105(1)】 次の2次方程式を解きなさい。<br>$x^2 + 7x + 6 = 0$",
+          correct: "$x = -1, -6$",
+          dummy: ["$x = 1, 6$", "$x = -2, -3$", "$x = 2, 3$"],
+          explanation: "$(x + 1)(x + 6) = 0$ より、$x = -1, -6$"
+        },
+        {
+          text: "【105(2)】 次の2次方程式を解きなさい。<br>$x^2 - 4x - 12 = 0$",
+          correct: "$x = 6, -2$",
+          dummy: ["$x = -6, 2$", "$x = 3, -4$", "$x = 6, 2$"],
+          explanation: "$(x - 6)(x + 2) = 0$ より、$x = 6, -2$"
+        },
+        {
+          text: "【105(3)】 次の2次方程式を解きなさい。<br>$x^2 + 2x + 1 = 0$",
+          correct: "$x = -1$",
+          dummy: ["$x = 1$", "$x = 1, -1$", "$x = -2$"],
+          explanation: "$(x + 1)^2 = 0$ より、重解 $x = -1$"
+        },
+        {
+          text: "【105(4)】 次の2次方程式を解きなさい。<br>$x^2 - 12x + 36 = 0$",
+          correct: "$x = 6$",
+          dummy: ["$x = -6$", "$x = 6, -6$", "$x = 12$"],
+          explanation: "$(x - 6)^2 = 0$ より、重解 $x = 6$"
+        },
+        {
+          text: "【105(5)】 次の2次方程式を解きなさい。<br>$x^2 + 14x + 49 = 0$",
+          correct: "$x = -7$",
+          dummy: ["$x = 7$", "$x = 7, -7$", "$x = -14$"],
+          explanation: "$(x + 7)^2 = 0$ より、重解 $x = -7$"
+        }
+      ]
+    },
+    {
+      id: "set-106-107",
+      title: "【問題2】問題106・107：2次方程式（解の公式）",
+      questions: [
+        {
+          text: "【106(1)】 次の2次方程式を解きなさい。<br>$x^2 + 7x + 5 = 0$",
+          correct: "$x = \\frac{-7 \\pm \\sqrt{29}}{2}$",
+          dummy: ["$x = \\frac{7 \\pm \\sqrt{29}}{2}$", "$x = \\frac{-7 \\pm \\sqrt{69}}{2}$", "$x = \\frac{-7 \\pm 29}{2}$"],
+          explanation: "解の公式 $x = \\frac{-b \\pm \\sqrt{b^2 - 4ac}}{2a}$ より<br>$x = \\frac{-7 \\pm \\sqrt{7^2 - 4 \\cdot 1 \\cdot 5}}{2 \\cdot 1} = \\frac{-7 \\pm \\sqrt{49 - 20}}{2} = \\frac{-7 \\pm \\sqrt{29}}{2}$"
+        },
+        {
+          text: "【106(2)】 次の2次方程式を解きなさい。<br>$3x^2 + 5x - 6 = 0$",
+          correct: "$x = \\frac{-5 \\pm \\sqrt{97}}{6}$",
+          dummy: ["$x = \\frac{-5 \\pm \\sqrt{97}}{3}$", "$x = \\frac{5 \\pm \\sqrt{97}}{6}$", "$x = \\frac{-5 \\pm \\sqrt{47}}{6}$"],
+          explanation: "解の公式より<br>$x = \\frac{-5 \\pm \\sqrt{5^2 - 4 \\cdot 3 \\cdot (-6)}}{2 \\cdot 3} = \\frac{-5 \\pm \\sqrt{25 + 72}}{6} = \\frac{-5 \\pm \\sqrt{97}}{6}$"
+        },
+        {
+          text: "【106(3)】 次の2次方程式を解きなさい。<br>$2x^2 - 9x + 3 = 0$",
+          correct: "$x = \\frac{9 \\pm \\sqrt{57}}{4}$",
+          dummy: ["$x = \\frac{-9 \\pm \\sqrt{57}}{4}$", "$x = \\frac{9 \\pm \\sqrt{57}}{2}$", "$x = \\frac{9 \\pm \\sqrt{105}}{4}$"],
+          explanation: "解の公式より<br>$x = \\frac{-(-9) \\pm \\sqrt{(-9)^2 - 4 \\cdot 2 \\cdot 3}}{2 \\cdot 2} = \\frac{9 \\pm \\sqrt{81 - 24}}{4} = \\frac{9 \\pm \\sqrt{57}}{4}$"
+        },
+        {
+          text: "【107(1)】 次の2次方程式を解きなさい。<br>$2x^2 - 3x - 7 = 0$",
+          correct: "$x = \\frac{3 \\pm \\sqrt{65}}{4}$",
+          dummy: ["$x = \\frac{-3 \\pm \\sqrt{65}}{4}$", "$x = \\frac{3 \\pm \\sqrt{65}}{2}$", "$x = \\frac{3 \\pm \\sqrt{47}}{4}$"],
+          explanation: "解の公式より<br>$x = \\frac{-(-3) \\pm \\sqrt{(-3)^2 - 4 \\cdot 2 \\cdot (-7)}}{2 \\cdot 2} = \\frac{3 \\pm \\sqrt{9 + 56}}{4} = \\frac{3 \\pm \\sqrt{65}}{4}$"
+        },
+        {
+          text: "【107(2)】 次の2次方程式を解きなさい。<br>$3x^2 - 6x + 1 = 0$",
+          correct: "$x = \\frac{3 \\pm \\sqrt{6}}{3}$",
+          dummy: ["$x = \\frac{6 \\pm \\sqrt{24}}{6}$", "$x = \\frac{3 \\pm \\sqrt{3}}{3}$", "$x = \\frac{-3 \\pm \\sqrt{6}}{3}$"],
+          explanation: "解の公式より<br>$x = \\frac{-(-6) \\pm \\sqrt{(-6)^2 - 4 \\cdot 3 \\cdot 1}}{2 \\cdot 3} = \\frac{6 \\pm \\sqrt{24}}{6} = \\frac{6 \\pm 2\\sqrt{6}}{6} = \\frac{3 \\pm \\sqrt{6}}{3}$"
+        },
+        {
+          text: "【107(3)】 次の2次方程式を解きなさい。<br>$x^2 + 4x - 7 = 0$",
+          correct: "$x = -2 \\pm \\sqrt{11}$",
+          dummy: ["$x = \\frac{-4 \\pm \\sqrt{44}}{2}$", "$x = 2 \\pm \\sqrt{11}$", "$x = -2 \\pm \\sqrt{44}$"],
+          explanation: "解の公式より<br>$x = \\frac{-4 \\pm \\sqrt{16 - 4 \\cdot 1 \\cdot (-7)}}{2} = \\frac{-4 \\pm \\sqrt{44}}{2} = \\frac{-4 \\pm 2\\sqrt{11}}{2} = -2 \\pm \\sqrt{11}$"
+        }
+      ]
+    },
+    {
+      id: "set-108-109",
+      title: "【問題3】問題108・109：2次関数とx軸の共有点のx座標(因数分解)",
+      questions: [
+        {
+          text: "【108(1)】 2次関数 $y = x^2 - 8x + 7$ のグラフと $x$ 軸との共有点の $x$ 座標を求めなさい。",
+          correct: "$x = 1, 7$",
+          dummy: ["$x = -1, -7$", "$x = -1, 7$", "$x = 1, -7$"],
+          explanation: "$y = 0$ とおくと $x^2 - 8x + 7 = 0$<br>$(x - 1)(x - 7) = 0$ より、$x = 1, 7$"
+        },
+        {
+          text: "【108(2)】 2次関数 $y = x^2 + 7x - 18$ のグラフと $x$ 軸との共有点の $x$ 座標を求めなさい。",
+          correct: "$x = 2, -9$",
+          dummy: ["$x = -2, 9$", "$x = 2, 9$", "$x = -2, -9$"],
+          explanation: "$y = 0$ とおくと $x^2 + 7x - 18 = 0$<br>$(x - 2)(x + 9) = 0$ より、$x = 2, -9$"
+        },
+        {
+          text: "【108(3)】 2次関数 $y = x^2 - 3x - 10$ のグラフと $x$ 軸との共有点の $x$ 座標を求めなさい。",
+          correct: "$x = 5, -2$",
+          dummy: ["$x = -5, 2$", "$x = 5, 2$", "$x = -5, -2$"],
+          explanation: "$y = 0$ とおくと $x^2 - 3x - 10 = 0$<br>$(x - 5)(x + 2) = 0$ より、$x = 5, -2$"
+        },
+        {
+          text: "【109(1)】 2次関数 $y = x^2 - 6x$ のグラフと $x$ 軸との共有点の $x$ 座標を求めなさい。",
+          correct: "$x = 0, 6$",
+          dummy: ["$x = 0, -6$", "$x = 6$", "$x = -6$"],
+          explanation: "$y = 0$ とおくと $x(x - 6) = 0$ より、$x = 0, 6$"
+        },
+        {
+          text: "【109(2)】 2次関数 $y = x^2 - 8x + 12$ のグラフと $x$ 軸との共有点の $x$ 座標を求めなさい。",
+          correct: "$x = 2, 6$",
+          dummy: ["$x = -2, -6$", "$x = -2, 6$", "$x = 2, -6$"],
+          explanation: "$y = 0$ とおくと $x^2 - 8x + 12 = 0$<br>$(x - 2)(x - 6) = 0$ より、$x = 2, 6$"
+        },
+        {
+          text: "【109(3)】 2次関数 $y = x^2 + 7x + 10$ のグラフと $x$ 軸との共有点の $x$ 座標を求めなさい。",
+          correct: "$x = -2, -5$",
+          dummy: ["$x = 2, 5$", "$x = 2, -5$", "$x = -2, 5$"],
+          explanation: "$y = 0$ とおくと $x^2 + 7x + 10 = 0$<br>$(x + 2)(x + 5) = 0$ より、$x = -2, -5$"
+        }
+      ]
+    },
+    {
+      id: "set-110-111",
+      title: "【問題4】問題110・111：2次関数とx軸の共有点のx座標(解の公式)",
+      questions: [
+        {
+          text: "【110(1)】 2次関数 $y = 2x^2 + 5x + 1$ のグラフと $x$ 軸との共有点の $x$ 座標を求めなさい。",
+          correct: "$x = \\frac{-5 \\pm \\sqrt{17}}{4}$",
+          dummy: ["$x = \\frac{5 \\pm \\sqrt{17}}{4}$", "$x = \\frac{-5 \\pm \\sqrt{17}}{2}$", "$x = \\frac{-5 \\pm \\sqrt{33}}{4}$"],
+          explanation: "$2x^2 + 5x + 1 = 0$ を解の公式で解くと<br>$x = \\frac{-5 \\pm \\sqrt{5^2 - 4 \\cdot 2 \\cdot 1}}{2 \\cdot 2} = \\frac{-5 \\pm \\sqrt{17}}{4}$"
+        },
+        {
+          text: "【110(2)】 2次関数 $y = x^2 - x - 4$ のグラフと $x$ 軸との共有点の $x$ 座標を求めなさい。",
+          correct: "$x = \\frac{1 \\pm \\sqrt{17}}{2}$",
+          dummy: ["$x = \\frac{-1 \\pm \\sqrt{17}}{2}$", "$x = \\frac{1 \\pm \\sqrt{15}}{2}$", "$x = 1 \\pm \\sqrt{17}$"],
+          explanation: "$x^2 - x - 4 = 0$ を解の公式で解くと<br>$x = \\frac{-(-1) \\pm \\sqrt{(-1)^2 - 4 \\cdot 1 \\cdot (-4)}}{2 \\cdot 1} = \\frac{1 \\pm \\sqrt{17}}{2}$"
+        },
+        {
+          text: "【110(3)】 2次関数 $y = x^2 + 7x + 1$ のグラフと $x$ 軸との共有点の $x$ 座標を求めなさい。",
+          correct: "$x = \\frac{-7 \\pm \\sqrt{45}}{2}$ または $x = \\frac{-7 \\pm 3\\sqrt{5}}{2}$",
+          dummy: ["$x = \\frac{7 \\pm 3\\sqrt{5}}{2}$", "$x = \\frac{-7 \\pm \\sqrt{53}}{2}$", "$x = \\frac{-7 \\pm \\sqrt{5}}{2}$"],
+          explanation: "$x^2 + 7x + 1 = 0$ を解の公式で解くと<br>$x = \\frac{-7 \\pm \\sqrt{7^2 - 4 \\cdot 1 \\cdot 1}}{2} = \\frac{-7 \\pm \\sqrt{45}}{2} = \\frac{-7 \\pm 3\\sqrt{5}}{2}$"
+        },
+        {
+          text: "【111(1)】 2次関数 $y = 2x^2 + 4x - 3$ のグラフと $x$ 軸との共有点の $x$ 座標を求めなさい。",
+          correct: "$x = \\frac{-2 \\pm \\sqrt{10}}{2}$",
+          dummy: ["$x = \\frac{-4 \\pm \\sqrt{40}}{4}$", "$x = \\frac{2 \\pm \\sqrt{10}}{2}$", "$x = -2 \\pm \\sqrt{10}$"],
+          explanation: "$2x^2 + 4x - 3 = 0$ を解の公式で解くと<br>$x = \\frac{-4 \\pm \\sqrt{16 - 4 \\cdot 2 \\cdot (-3)}}{4} = \\frac{-4 \\pm \\sqrt{40}}{4} = \\frac{-4 \\pm 2\\sqrt{10}}{4} = \\frac{-2 \\pm \\sqrt{10}}{2}$"
+        },
+        {
+          text: "【111(2)】 2次関数 $y = 3x^2 - 6x - 1$ のグラフと $x$ 軸との共有点の $x$ 座標を求めなさい。",
+          correct: "$x = \\frac{3 \\pm \\sqrt{12}}{3}$ または $x = \\frac{3 \\pm 2\\sqrt{3}}{3}$",
+          dummy: ["$x = \\frac{6 \\pm 4\\sqrt{3}}{6}$", "$x = \\frac{-3 \\pm 2\\sqrt{3}}{3}$", "$x = 1 \\pm \\sqrt{3}$"],
+          explanation: "$3x^2 - 6x - 1 = 0$ を解の公式で解くと<br>$x = \\frac{6 \\pm \\sqrt{36 - 4 \\cdot 3 \\cdot (-1)}}{6} = \\frac{6 \\pm \\sqrt{48}}{6} = \\frac{6 \\pm 4\\sqrt{3}}{6} = \\frac{3 \\pm 2\\sqrt{3}}{3}$"
+        },
+        {
+          text: "【111(3)】 2次関数 $y = x^2 - 6x + 2$ のグラフと $x$ 軸との共有点の $x$ 座標を求めなさい。",
+          correct: "$x = 3 \\pm \\sqrt{7}$",
+          dummy: ["$x = \\frac{6 \\pm \\sqrt{28}}{2}$", "$x = -3 \\pm \\sqrt{7}$", "$x = 3 \\pm \\sqrt{28}$"],
+          explanation: "$x^2 - 6x + 2 = 0$ を解の公式で解くと<br>$x = \\frac{6 \\pm \\sqrt{36 - 4 \\cdot 1 \\cdot 2}}{2} = \\frac{6 \\pm \\sqrt{28}}{2} = \\frac{6 \\pm 2\\sqrt{7}}{2} = 3 \\pm \\sqrt{7}$"
+        }
+      ]
+    },
+    {
+      id: "set-114-115",
+      title: "【問題5】問題114・115：2次不等式（因数分解型）",
+      questions: [
+        {
+          text: "【114(1)】 次の2次不等式を解きなさい。<br>$x^2 - 7x + 10 > 0$",
+          correct: "$x < 2,\\  5 < x$",
+          dummy: ["$2 < x < 5$", "$x < -5,\\  -2 < x$", "$-5 < x < -2$"],
+          explanation: "$(x - 2)(x - 5) > 0$ より、$x < 2,\\ 5 < x$"
+        },
+        {
+          text: "【114(2)】 次の2次不等式を解きなさい。<br>$x^2 - 5x - 14 > 0$",
+          correct: "$x < -2,\\  7 < x$",
+          dummy: ["$-2 < x < 7$", "$x < -7,\\  2 < x$", "$-7 < x < 2$"],
+          explanation: "$(x + 2)(x - 7) > 0$ より、$x < -2,\\ 7 < x$"
+        },
+        {
+          text: "【114(3)】 次の2次不等式を解きなさい。<br>$x^2 + x - 12 \\geqq 0$",
+          correct: "$x \\leqq -4,\\  3 \\leqq x$",
+          dummy: ["$-4 \\leqq x \\leqq 3$", "$x \\leqq -3,\\  4 \\leqq x$", "$-3 \\leqq x \\leqq 4$"],
+          explanation: "$(x + 4)(x - 3) \\geqq 0$ より、$x \\leqq -4,\\ 3 \\leqq x$"
+        },
+        {
+          text: "【115(1)】 次の2次不等式を解きなさい。<br>$x^2 - 8x + 7 < 0$",
+          correct: "$1 < x < 7$",
+          dummy: ["$x < 1,\\  7 < x$", "$-7 < x < -1$", "$x < -7,\\  -1 < x$"],
+          explanation: "$(x - 1)(x - 7) < 0$ より、$1 < x < 7$"
+        },
+        {
+          text: "【115(2)】 次の2次不等式を解きなさい。<br>$x^2 + 9x + 18 < 0$",
+          correct: "$-6 < x < -3$",
+          dummy: ["$x < -6,\\  -3 < x$", "$3 < x < 6$", "$x < 3,\\  6 < x$"],
+          explanation: "$(x + 6)(x + 3) < 0$ より、$-6 < x < -3$"
+        },
+        {
+          text: "【115(3)】 次の2次不等式を解きなさい。<br>$x^2 + x - 20 \\leqq 0$",
+          correct: "$-5 \\leqq x \\leqq 4$",
+          dummy: ["$x \\leqq -5,\\  4 \\leqq x$", "$-4 \\leqq x \\leqq 5$", "$x \\leqq -4,\\  5 \\leqq x$"],
+          explanation: "$(x + 5)(x - 4) \\leqq 0$ より、$-5 \\leqq x \\leqq 4$"
+        }
+      ]
+    },
+    {
+      id: "set-116-117",
+      title: "【問題6】問題116・117：2次不等式（解の公式型・負の係数）",
+      questions: [
+        {
+          text: "【116(1)】 次の2次不等式を解きなさい。<br>$x^2 - 7x + 3 > 0$",
+          correct: "$x < \\frac{7 - \\sqrt{37}}{2},\\  \\frac{7 + \\sqrt{37}}{2} < x$",
+          dummy: [
+            "$\\frac{7 - \\sqrt{37}}{2} < x < \\frac{7 + \\sqrt{37}}{2}$",
+            "$x < \\frac{-7 - \\sqrt{37}}{2},\\  \\frac{-7 + \\sqrt{37}}{2} < x$",
+            "$\\frac{-7 - \\sqrt{37}}{2} < x < \\frac{-7 + \\sqrt{37}}{2}$"
+          ],
+          explanation: "$x^2 - 7x + 3 = 0$ の解は $x = \\frac{7 \\pm \\sqrt{37}}{2}$<br>よって > 0 より、$x < \\frac{7 - \\sqrt{37}}{2},\\ \\frac{7 + \\sqrt{37}}{2} < x$"
+        },
+        {
+          text: "【116(2)】 次の2次不等式を解きなさい。<br>$x^2 + x - 8 < 0$",
+          correct: "$\\frac{-1 - \\sqrt{33}}{2} < x < \\frac{-1 + \\sqrt{33}}{2}$",
+          dummy: [
+            "$x < \\frac{-1 - \\sqrt{33}}{2},\\  \\frac{-1 + \\sqrt{33}}{2} < x$",
+            "$\\frac{1 - \\sqrt{33}}{2} < x < \\frac{1 + \\sqrt{33}}{2}$",
+            "$x < \\frac{1 - \\sqrt{33}}{2},\\  \\frac{1 + \\sqrt{33}}{2} < x$"
+          ],
+          explanation: "$x^2 + x - 8 = 0$ の解は $x = \\frac{-1 \\pm \\sqrt{33}}{2}$<br>よって < 0 より、$\\frac{-1 - \\sqrt{33}}{2} < x < \\frac{-1 + \\sqrt{33}}{2}$"
+        },
+        {
+          text: "【116(3)】 次の2次不等式を解きなさい。<br>$x^2 - 5x - 1 \\leqq 0$",
+          correct: "$\\frac{5 - \\sqrt{29}}{2} \\leqq x \\leqq \\frac{5 + \\sqrt{29}}{2}$",
+          dummy: [
+            "$x \\leqq \\frac{5 - \\sqrt{29}}{2},\\  \\frac{5 + \\sqrt{29}}{2} \\leqq x$",
+            "$\\frac{-5 - \\sqrt{29}}{2} \\leqq x \\leqq \\frac{-5 + \\sqrt{29}}{2}$",
+            "$x \\leqq \\frac{-5 - \\sqrt{29}}{2},\\  \\frac{-5 + \\sqrt{29}}{2} \\leqq x$"
+          ],
+          explanation: "$x^2 - 5x - 1 = 0$ の解は $x = \\frac{5 \\pm \\sqrt{29}}{2}$<br>よって $\\leqq 0$ より、$\\frac{5 - \\sqrt{29}}{2} \\leqq x \\leqq \\frac{5 + \\sqrt{29}}{2}$"
+        },
+        {
+          text: "【117(1)】 次の2次不等式を解きなさい。<br>$-x^2 + 3x - 2 < 0$",
+          correct: "$x < 1,\\  2 < x$",
+          dummy: ["$1 < x < 2$", "$x < -2,\\  -1 < x$", "$-2 < x < -1$"],
+          explanation: "両辺に $-1$ をかけると不等号の向きが入れ替わり、$x^2 - 3x + 2 > 0$<br>$(x - 1)(x - 2) > 0$ より、$x < 1,\\ 2 < x$"
+        },
+        {
+          text: "【117(2)】 次の2次不等式を解きなさい。<br>$-x^2 - 5x + 14 > 0$",
+          correct: "$-7 < x < 2$",
+          dummy: ["$x < -7,\\  2 < x$", "$-2 < x < 7$", "$x < -2,\\  7 < x$"],
+          explanation: "両辺に $-1$ をかけると $x^2 + 5x - 14 < 0$<br>$(x + 7)(x - 2) < 0$ より、$-7 < x < 2$"
+        },
+        {
+          text: "【117(3)】 次の2次不等式を解きなさい。<br>$-x^2 - 6x + 27 \\leqq 0$",
+          correct: "$x \\leqq -9,\\  3 \\leqq x$",
+          dummy: ["$-9 \\leqq x \\leqq 3$", "$x \\leqq -3,\\  9 \\leqq x$", "$-3 \\leqq x \\leqq 9$"],
+          explanation: "両辺に $-1$ をかけると $x^2 + 6x - 27 \\geqq 0$<br>$(x + 9)(x - 3) \\geqq 0$ より、$x \\leqq -9,\\ 3 \\leqq x$"
+        }
+      ]
+    }
+  ];
+
+  let currentSet = null;
+  let currentQuestions = [];
+  let currentQIndex = 0;
+  let score = 0;
+  let userAnswers = []; 
+  let userInfo = { grade: "", classNum: "", number: "", name: "" };
+  let isMemoVisible = false;
+  let selectedRating = 0;
+
+  function populateSelectOptions() {
+    const gradeSelect = document.getElementById("input-grade");
+    const classSelect = document.getElementById("input-class");
+    const numberSelect = document.getElementById("input-number");
+
+    gradeSelect.innerHTML = '<option value="">選択</option>';
+    classSelect.innerHTML = '<option value="">選択</option>';
+    numberSelect.innerHTML = '<option value="">選択</option>';
+
+    for (let i = 1; i <= 3; i++) {
+      const opt = document.createElement("option");
+      opt.value = i;
+      opt.textContent = i;
+      gradeSelect.appendChild(opt);
+    }
+
+    for (let i = 1; i <= 4; i++) {
+      const opt = document.createElement("option");
+      opt.value = i;
+      opt.textContent = i;
+      classSelect.appendChild(opt);
+    }
+
+    for (let i = 1; i <= 40; i++) {
+      const opt = document.createElement("option");
+      opt.value = i;
+      opt.textContent = i;
+      numberSelect.appendChild(opt);
+    }
+  }
+
+  function loadUserInfo() {
+    const saved = localStorage.getItem("mathQuizUserInfo");
+    if (saved) {
+      userInfo = JSON.parse(saved);
+      if (userInfo.grade && userInfo.classNum && userInfo.number && userInfo.name) {
+        document.getElementById("input-grade").value = userInfo.grade;
+        document.getElementById("input-class").value = userInfo.classNum;
+        document.getElementById("input-number").value = userInfo.number;
+        document.getElementById("input-name").value = userInfo.name;
+        updateUserDisplayBar();
+        return true;
+      }
+    }
+    return false;
+  }
+
+  function saveUserInfo(e) {
+    e.preventDefault();
+    userInfo.grade = document.getElementById("input-grade").value;
+    userInfo.classNum = document.getElementById("input-class").value;
+    userInfo.number = document.getElementById("input-number").value;
+    userInfo.name = document.getElementById("input-name").value.trim();
+
+    localStorage.setItem("mathQuizUserInfo", JSON.stringify(userInfo));
+    updateUserDisplayBar();
+    showMenu();
+  }
+
+  function resetAllData() {
+    if (confirm("名前・学年組情報およびすべての解答履歴を削除して初期化しますか？")) {
+      localStorage.clear();
+      userInfo = { grade: "", classNum: "", number: "", name: "" };
+      document.getElementById("input-grade").value = "";
+      document.getElementById("input-class").value = "";
+      document.getElementById("input-number").value = "";
+      document.getElementById("input-name").value = "";
+      alert("データをすべてリセットしました。");
+      showUserInfoForm();
+    }
+  }
+
+  function updateUserDisplayBar() {
+    const textEl = document.getElementById("user-display-text");
+    textEl.textContent = `👤 ${userInfo.grade}年 ${userInfo.classNum}組 ${userInfo.number}番  ${userInfo.name} さん`;
+  }
+
+  function showUserInfoForm() {
+    document.getElementById("user-info-box").style.display = "block";
+    document.getElementById("menu-box").style.display = "none";
+    document.getElementById("quiz-box").style.display = "none";
+    document.getElementById("score-box").style.display = "none";
+  }
+
+  function renderMath() {
+    if (window.MathJax) {
+      MathJax.typesetPromise();
+    }
+  }
+
+  function getAccuracyRecord(setId) {
+    const saved = localStorage.getItem(`accuracy_${setId}`);
+    return saved !== null ? saved : null;
+  }
+
+  function saveAccuracyRecord(setId, accuracyRate) {
+    localStorage.setItem(`accuracy_${setId}`, accuracyRate);
+  }
+
+  async function showMenu() {
+    if (document.getElementById("score-box").style.display !== "none") {
+      const isSuccess = processAutoSubmit();
+      if (!isSuccess) return;
+    }
+
+    document.getElementById("user-info-box").style.display = "none";
+    document.getElementById("menu-box").style.display = "block";
+    document.getElementById("quiz-box").style.display = "none";
+    document.getElementById("score-box").style.display = "none";
+
+    // 学年・組・番号から生徒ID（例: 1105）を生成
+    const studentId = `${userInfo.grade}${userInfo.classNum}${String(userInfo.number).padStart(2, '0')}`;
+    
+    // スプレッドシート（GAS）から生徒成績を取得
+    let onlineRecords = {};
+    if (GAS_WEBAPP_URL) {
+      try {
+        const response = await fetch(`${GAS_WEBAPP_URL}?studentId=${studentId}`);
+        onlineRecords = await response.json();
+      } catch (e) {
+        console.error("成績データ取得失敗:", e);
+      }
+    }
+
+    const basicContainer = document.getElementById("menu-basic-container");
+    basicContainer.innerHTML = "";
+
+    quizSets.forEach(set => {
+      const card = document.createElement("div");
+      card.className = "menu-card";
+
+      // オンラインデータがあればそれを優先、なければローカルストレージを参照
+      const acc = onlineRecords[set.id] !== undefined ? onlineRecords[set.id] : getAccuracyRecord(set.id);
+      const accText = acc !== null && acc !== undefined ? `最高正答率: ${acc}%` : "未回答";
+
+      card.innerHTML = `
+        <div>
+          <div class="menu-card-title">${set.title}</div>
+        </div>
+        <div class="menu-card-stats">
+          <span class="menu-card-badge">${set.questions.length}問</span>
+          <span class="menu-card-accuracy">${accText}</span>
+        </div>
+      `;
+      card.onclick = () => startQuiz(set.id);
+      basicContainer.appendChild(card);
+    });
+
+    renderMath();
+  }
+
+  function startQuiz(setId) {
+    currentSet = quizSets.find(s => s.id === setId);
+    currentQuestions = [...currentSet.questions];
+    currentQIndex = 0;
+    score = 0;
+    userAnswers = [];
+
+    document.getElementById("menu-box").style.display = "none";
+    document.getElementById("quiz-box").style.display = "block";
+    document.getElementById("score-box").style.display = "none";
+
+    isMemoVisible = false;
+    updateMemoVisibility();
+
+    showQuestion();
+  }
+
+  function showQuestion() {
+    document.getElementById("result-section").style.display = "none";
+    clearMemoCanvas();
+
+    const q = currentQuestions[currentQIndex];
+    document.getElementById("q-num").textContent = `第 ${currentQIndex + 1} 問 / 全 ${currentQuestions.length} 問`;
+    
+    const titleEl = document.getElementById("q-title");
+    titleEl.innerHTML = q.text;
+
+    const optionsContainer = document.getElementById("options-container");
+    optionsContainer.style.display = "grid";
+    optionsContainer.innerHTML = "";
+
+    let choices = [
+      { text: q.correct, isCorrect: true },
+      ...q.dummy.map(d => ({ text: d, isCorrect: false }))
+    ];
+    choices.sort(() => Math.random() - 0.5);
+
+    choices.forEach(choice => {
+      const btn = document.createElement("button");
+      btn.className = "btn-option";
+      btn.innerHTML = choice.text;
+      btn.onclick = () => checkAnswer(choice.isCorrect, btn, q);
+      optionsContainer.appendChild(btn);
+    });
+
+    renderMath();
+  }
+
+  function checkAnswer(isCorrect, selectedBtn, questionObj) {
+    const buttons = document.querySelectorAll(".btn-option");
+    buttons.forEach(btn => btn.disabled = true);
+
+    userAnswers.push({
+      qIndex: currentQIndex + 1,
+      isCorrect: isCorrect
+    });
+
+    if (isCorrect) {
+      score++;
+      selectedBtn.classList.add("correct-choice");
+      document.getElementById("result-text").textContent = "⭕️ 正解！";
+      document.getElementById("result-text").className = "result-header correct";
+    } else {
+      selectedBtn.classList.add("wrong-choice");
+      document.getElementById("result-text").textContent = "❌ 不正解...";
+      document.getElementById("result-text").className = "result-header incorrect";
+      
+      buttons.forEach(btn => {
+        if (btn.innerHTML.trim() === questionObj.correct.trim()) {
+          btn.classList.add("correct-choice");
+        }
+      });
+    }
+
+    document.getElementById("explanation-text").innerHTML = questionObj.explanation;
+    document.getElementById("result-section").style.display = "block";
+    renderMath();
+  }
+
+  function nextQuestion() {
+    currentQIndex++;
+    if (currentQIndex < currentQuestions.length) {
+      showQuestion();
+    } else {
+      showScore();
+    }
+  }
+
+  function setRating(val, btn) {
+    selectedRating = val;
+    document.querySelectorAll(".btn-rating").forEach(b => b.classList.remove("selected"));
+    btn.classList.add("selected");
+  }
+
+  function showScore() {
+    document.getElementById("quiz-box").style.display = "none";
+    document.getElementById("score-box").style.display = "block";
+
+    const total = currentQuestions.length;
+    const accuracyRate = Math.round((score / total) * 100);
+
+    saveAccuracyRecord(currentSet.id, accuracyRate);
+
+    let answerDetailsStr = userAnswers.map(a => a.isCorrect ? "○" : "×").join("");
+
+    document.getElementById("score-title").textContent = `🎉 「${currentSet.title}」 終了 🎉`;
+    document.getElementById("score-text").textContent = `${total} 問中 ${score} 問 正解！`;
+    document.getElementById("accuracy-text").textContent = `正答率: ${accuracyRate}%`;
+    document.getElementById("details-text").textContent = `結果: ${answerDetailsStr}`;
+
+    selectedRating = 0;
+    document.querySelectorAll(".btn-rating").forEach(b => b.classList.remove("selected"));
+    document.getElementById("reflection-comment").value = "";
+    
+    const statusEl = document.getElementById("send-status");
+    statusEl.style.display = "none";
+    statusEl.textContent = "";
+
+    renderMath();
+  }
+
+  function processAutoSubmit() {
+    const comment = document.getElementById("reflection-comment").value.trim();
+    
+    if (selectedRating === 0 || comment === "") {
+      alert("振り返り項目（理解度とコメント）を入力してください。");
+      return false;
+    }
+
+    const total = currentQuestions.length;
+    const accuracyRate = Math.round((score / total) * 100);
+    let answerDetailsStr = userAnswers.map(a => a.isCorrect ? "○" : "×").join("");
+
+    sendDataToTeacher(currentSet.id, currentSet.title, score, total, accuracyRate, answerDetailsStr, selectedRating, comment);
+    return true;
+  }
+
+  function sendDataToTeacher(setId, setTitle, score, total, accuracy, details, rating, comment) {
+    if (!GAS_WEBAPP_URL) return;
+
+    const payload = {
+      grade: parseInt(userInfo.grade, 10),
+      classNum: parseInt(userInfo.classNum, 10),
+      number: parseInt(userInfo.number, 10),
+      name: userInfo.name,
+      setId: setId,
+      setTitle: setTitle,
+      score: score,
+      total: total,
+      accuracy: accuracy,
+      details: details,
+      rating: rating,
+      comment: comment
+    };
+
+    fetch(GAS_WEBAPP_URL, {
+      method: "POST",
+      mode: "no-cors",
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
+      body: JSON.stringify(payload)
+    })
+    .catch(err => {
+      console.error("送信エラー:", err);
+    });
+  }
+
+  function restartQuiz() {
+    const isSuccess = processAutoSubmit();
+    if (isSuccess) {
+      startQuiz(currentSet.id);
+    }
+  }
+
+  /* --- 計算用メモ機能 --- */
+  let memoCanvas = document.getElementById("memo-canvas");
+  let memoCtx = memoCanvas.getContext("2d");
+  let isDrawing = false;
+  let memoMode = 'pen';
+  let lastX = 0;
+  let lastY = 0;
+
+  function toggleMemoLayout() {
+    isMemoVisible = !isMemoVisible;
+    updateMemoVisibility();
+  }
+
+  function updateMemoVisibility() {
+    const mainContainer = document.getElementById("main-container");
+    const memoPanel = document.getElementById("memo-panel");
+    const toggleBtn = document.getElementById("memo-toggle-btn");
+
+    if (isMemoVisible) {
+      mainContainer.classList.add("split-layout");
+      memoPanel.style.display = "flex";
+      toggleBtn.textContent = "✏️ 計算メモを隠す";
+      toggleBtn.classList.add("active");
+      setTimeout(resizeMemoCanvas, 50);
+    } else {
+      mainContainer.classList.remove("split-layout");
+      memoPanel.style.display = "none";
+      toggleBtn.textContent = "✏️ 計算メモを表示";
+      toggleBtn.classList.remove("active");
+    }
+  }
+
+  function resizeMemoCanvas() {
+    const wrapper = document.getElementById("memo-canvas-wrapper");
+    if (!wrapper || wrapper.clientWidth === 0) return;
+
+    if (memoCanvas.width !== wrapper.clientWidth || memoCanvas.height !== wrapper.clientHeight) {
+      const tempCanvas = document.createElement("canvas");
+      tempCanvas.width = memoCanvas.width;
+      tempCanvas.height = memoCanvas.height;
+      const tempCtx = tempCanvas.getContext("2d");
+      tempCtx.drawImage(memoCanvas, 0, 0);
+
+      memoCanvas.width = wrapper.clientWidth;
+      memoCanvas.height = wrapper.clientHeight;
+
+      memoCtx.drawImage(tempCanvas, 0, 0);
+      updateMemoStyle();
+    }
+  }
+
+  function setMemoMode(mode) {
+    memoMode = mode;
+    document.getElementById("tool-pen").classList.toggle("active", mode === 'pen');
+    document.getElementById("tool-eraser").classList.toggle("active", mode === 'eraser');
+    updateMemoStyle();
+  }
+
+  function updateMemoStyle() {
+    memoCtx.lineCap = "round";
+    memoCtx.lineJoin = "round";
+    const size = document.getElementById("memo-size").value;
+    
+    if (memoMode === 'eraser') {
+      memoCtx.globalCompositeOperation = "destination-out";
+      memoCtx.lineWidth = size * 4;
+    } else {
+      memoCtx.globalCompositeOperation = "source-over";
+      memoCtx.strokeStyle = document.getElementById("memo-color").value;
+      memoCtx.lineWidth = size;
+    }
+  }
+
+  function clearMemoCanvas() {
+    memoCtx.clearRect(0, 0, memoCanvas.width, memoCanvas.height);
+  }
+
+  function getCanvasPos(e) {
+    const rect = memoCanvas.getBoundingClientRect();
+    let clientX = e.clientX;
+    let clientY = e.clientY;
+
+    if (e.touches && e.touches.length > 0) {
+      clientX = e.touches[0].clientX;
+      clientY = e.touches[0].clientY;
+    }
+
+    const scaleX = memoCanvas.width / rect.width;
+    const scaleY = memoCanvas.height / rect.height;
+
+    return {
+      x: (clientX - rect.left) * scaleX,
+      y: (clientY - rect.top) * scaleY
+    };
+  }
+
+  function startDrawing(e) {
+    isDrawing = true;
+    const pos = getCanvasPos(e);
+    lastX = pos.x;
+    lastY = pos.y;
+  }
+
+  function draw(e) {
+    if (!isDrawing) return;
+    e.preventDefault();
+
+    const pos = getCanvasPos(e);
+
+    memoCtx.beginPath();
+    memoCtx.moveTo(lastX, lastY);
+    memoCtx.lineTo(pos.x, pos.y);
+    memoCtx.stroke();
+
+    lastX = pos.x;
+    lastY = pos.y;
+  }
+
+  function stopDrawing() {
+    isDrawing = false;
+  }
+
+  memoCanvas.addEventListener("mousedown", startDrawing);
+  memoCanvas.addEventListener("mousemove", draw);
+  memoCanvas.addEventListener("mouseup", stopDrawing);
+  memoCanvas.addEventListener("mouseout", stopDrawing);
+
+  memoCanvas.addEventListener("touchstart", startDrawing, { passive: false });
+  memoCanvas.addEventListener("touchmove", draw, { passive: false });
+  memoCanvas.addEventListener("touchend", stopDrawing);
+
+  window.addEventListener("resize", () => {
+    if (isMemoVisible) {
+      resizeMemoCanvas();
+    }
+  });
+
+  populateSelectOptions(); 
+
+  if (loadUserInfo()) {
+    showMenu();
+  } else {
+    showUserInfoForm();
+  }
+</script>
+
+</body>
+</html>

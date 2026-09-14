@@ -3,7 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>2次方程式・2次不等式 学習アプリ</title>
+  <title>2次方程式・2次不等式 学習アプリ & ルートマスター</title>
+  
   <!-- MathJax JS for Math Rendering -->
   <script>
     MathJax = {
@@ -17,6 +18,10 @@
   </script>
   <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
   
+  <!-- KaTeX for Root Master Rendering -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+
   <style>
     * { box-sizing: border-box; }
     body {
@@ -47,6 +52,7 @@
       -moz-user-select: none;
       -ms-user-select: none;
       user-select: none;
+      position: relative;
     }
 
     .quiz-container.split-layout {
@@ -446,6 +452,22 @@
     }
     .btn-primary:hover { background-color: #0056b3; }
 
+    .btn-warning {
+      background-color: #ff9800;
+      color: white;
+      border: none;
+      padding: 16px 32px;
+      border-radius: 8px;
+      font-size: 18px;
+      font-weight: bold;
+      cursor: pointer;
+      margin-top: 12px;
+      display: block;
+      transition: background-color 0.2s;
+      width: 100%;
+    }
+    .btn-warning:hover { background-color: #e68a00; }
+
     .btn-danger {
       background-color: #dc3545;
       color: white;
@@ -507,6 +529,156 @@
       top: 0; left: 0;
       width: 100%; height: 100%;
       cursor: crosshair; 
+    }
+
+    /* ルートマスター専用スタイル */
+    .root-master-box {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    .rm-screen {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      width: 100%;
+    }
+    .rm-screen.active {
+      display: flex;
+    }
+    .rm-timer-container {
+      width: 100%;
+      height: 8px;
+      background: #e2e8f0;
+      border-radius: 4px;
+      margin-bottom: 24px;
+      overflow: hidden;
+    }
+    .rm-timer-bar {
+      height: 100%;
+      background: #3b82f6;
+      width: 100%;
+      transition: width 0.1s linear;
+    }
+    .rm-question-box {
+      background: #eff6ff;
+      border: 2px solid #bfdbfe;
+      border-radius: 16px;
+      padding: 24px;
+      width: 100%;
+      margin-bottom: 24px;
+    }
+    .rm-question-label {
+      font-size: 0.85rem;
+      color: #3b82f6;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 8px;
+    }
+    .rm-question-target {
+      font-size: 2.5rem;
+      font-weight: bold;
+      color: #1e3a8a;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 70px;
+    }
+    .rm-options-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      width: 100%;
+    }
+    .rm-option-btn {
+      background: #f1f5f9;
+      border: 2px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 12px;
+      font-size: 1.8rem;
+      font-weight: bold;
+      color: #334155;
+      cursor: pointer;
+      transition: all 0.15s;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 80px;
+    }
+    .rm-option-btn:hover {
+      background: #e2e8f0;
+      border-color: #cbd5e1;
+    }
+    .rm-option-btn.correct {
+      background-color: #dcfce7 !important;
+      border-color: #10b981 !important;
+      color: #166534 !important;
+    }
+    .rm-option-btn.wrong {
+      background-color: #fee2e2 !important;
+      border-color: #ef4444 !important;
+      color: #991b1b !important;
+    }
+    .rm-feedback-overlay {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0);
+      font-size: 6rem;
+      pointer-events: none;
+      transition: transform 0.2s ease-out;
+      z-index: 10;
+    }
+    .rm-feedback-overlay.show {
+      transform: translate(-50%, -50%) scale(1);
+    }
+    .rm-score-display {
+      font-size: 3rem;
+      font-weight: 800;
+      color: #3b82f6;
+      margin: 16px 0;
+    }
+    .rm-result-stats {
+      width: 100%;
+      background: #f8fafc;
+      border-radius: 12px;
+      padding: 12px;
+      margin-bottom: 16px;
+    }
+    .rm-stat-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px 0;
+      border-bottom: 1px solid #e2e8f0;
+    }
+    .rm-stat-row:last-child {
+      border-bottom: none;
+    }
+    .rm-review-list {
+      width: 100%;
+      max-height: 180px;
+      overflow-y: auto;
+      text-align: left;
+      margin-bottom: 16px;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 8px;
+    }
+    .rm-review-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 6px 8px;
+      font-size: 1.1rem;
+      border-bottom: 1px dashed #e2e8f0;
+    }
+    .rm-review-item:last-child {
+      border-bottom: none;
     }
   </style>
 </head>
@@ -664,10 +836,75 @@
 
     <div class="send-status" id="send-status" style="display: none;"></div>
 
-    <!-- 振り返り画面のボタンを青色（btn-primary）に変更 -->
-    <div style="margin-top: 24px; max-width: 500px; margin-left: auto; margin-right: auto;">
+    <!-- 振り返り完了後に表示される操作ボタン類 -->
+    <div style="margin-top: 24px; max-width: 500px; margin-left: auto; margin-right: auto; display: flex; flex-direction: column; gap: 10px;">
+      <button class="btn-warning" id="minigame-start-btn" style="display: none;" onclick="startMiniGameFromScore()">🎮 ミニゲーム「ルートマスター」で遊ぶ</button>
       <button class="btn-primary" onclick="restartQuiz()">もう一度解く</button>
       <button class="btn-primary" onclick="showMenu()">メニュー画面に戻る</button>
+    </div>
+  </div>
+
+  <!-- 4. ルートマスター（ミニゲーム）画面 -->
+  <div id="root-master-box" class="root-master-box" style="display: none;">
+    <div id="rm-feedback" class="rm-feedback-overlay"></div>
+
+    <!-- スタート画面 -->
+    <div id="rm-start-screen" class="rm-screen active">
+      <h1 style="font-size: 1.8rem; margin-bottom: 8px; color: #0f172a;">ルートマスター</h1>
+      <p style="color: #64748b; font-size: 0.95rem; margin-bottom: 24px;">
+        指示された平方根と等しい <span id="rm-title-ab"></span> の形を選ぼう！
+      </p>
+      
+      <div style="margin: 20px 0; font-size: 1.1rem; background: #f1f5f9; padding: 16px; border-radius: 12px; width: 100%;">
+        制限時間: <b>30秒</b><br>
+        最高記録: <span id="rm-high-score">0</span> pts
+      </div>
+
+      <button class="btn-primary" onclick="game.start()">スタート！</button>
+      <button class="btn-small-menu" style="margin-top: 12px; width: 100%; padding: 12px;" onclick="showMenu()">学習メニューに戻る</button>
+    </div>
+
+    <!-- ゲーム画面 -->
+    <div id="rm-game-screen" class="rm-screen">
+      <div style="display: flex; justify-content: space-between; width: 100%; margin-bottom: 16px; font-weight: 600; font-size: 1.1rem;">
+        <div>スコア: <span id="rm-score">0</span></div>
+        <div>コンボ: <span id="rm-combo">0</span></div>
+      </div>
+
+      <div class="rm-timer-container">
+        <div id="rm-timer-bar" class="rm-timer-bar"></div>
+      </div>
+
+      <div class="rm-question-box">
+        <div class="rm-question-label">これと等しい値を選べ</div>
+        <div class="rm-question-target" id="rm-target-val"></div>
+      </div>
+
+      <div class="rm-options-grid" id="rm-options-grid"></div>
+    </div>
+
+    <!-- リザルト画面 -->
+    <div id="rm-result-screen" class="rm-screen">
+      <h1 style="font-size: 1.8rem; margin-bottom: 8px; color: #0f172a;">タイムアップ！</h1>
+      <div class="rm-score-display" id="rm-final-score">0</div>
+      
+      <div class="rm-result-stats">
+        <div class="rm-stat-row">
+          <span>正解数</span>
+          <b id="rm-stat-correct">0</b>
+        </div>
+        <div class="rm-stat-row">
+          <span>最大コンボ</span>
+          <b id="rm-stat-max-combo">0</b>
+        </div>
+      </div>
+
+      <div style="width: 100%; text-align: left; font-size: 0.85rem; font-weight: bold; color: #64748b; margin-bottom: 4px;">
+        復習ノート（今回の出題）:
+      </div>
+      <div class="rm-review-list" id="rm-review-list"></div>
+
+      <button class="btn-small-menu" style="margin-top: 12px; width: 100%; padding: 12px;" onclick="showMenu()">学習メニューに戻る</button>
     </div>
   </div>
 
@@ -1137,6 +1374,7 @@
     document.getElementById("menu-box").style.display = "none";
     document.getElementById("quiz-box").style.display = "none";
     document.getElementById("score-box").style.display = "none";
+    document.getElementById("root-master-box").style.display = "none";
   }
 
   function renderMath() {
@@ -1200,6 +1438,8 @@
 
   async function showMenu() {
     stopTimer();
+    if (game && game.timer) clearInterval(game.timer);
+
     if (document.getElementById("score-box").style.display !== "none") {
       const isSuccess = await processAutoSubmit();
       if (!isSuccess) return;
@@ -1209,6 +1449,7 @@
     document.getElementById("menu-box").style.display = "block";
     document.getElementById("quiz-box").style.display = "none";
     document.getElementById("score-box").style.display = "none";
+    document.getElementById("root-master-box").style.display = "none";
 
     const studentId = get4DigitId(userInfo.grade, userInfo.classNum, userInfo.number);
     
@@ -1304,6 +1545,7 @@
     document.getElementById("menu-box").style.display = "none";
     document.getElementById("quiz-box").style.display = "block";
     document.getElementById("score-box").style.display = "none";
+    document.getElementById("root-master-box").style.display = "none";
 
     isMemoVisible = false;
     updateMemoVisibility();
@@ -1394,6 +1636,7 @@
   function showScore() {
     document.getElementById("quiz-box").style.display = "none";
     document.getElementById("score-box").style.display = "block";
+    document.getElementById("root-master-box").style.display = "none";
 
     const total = currentQuestions.length;
     const accuracyRate = Math.round((score / total) * 100);
@@ -1418,6 +1661,14 @@
     }
 
     document.getElementById("details-text").textContent = `結果: ${answerDetailsStr}`;
+
+    // 全問正解（満点）の時のみミニゲームボタンを表示
+    const miniGameBtn = document.getElementById("minigame-start-btn");
+    if (score === total) {
+      miniGameBtn.style.display = "block";
+    } else {
+      miniGameBtn.style.display = "none";
+    }
 
     selectedRating = 0;
     document.querySelectorAll(".btn-rating").forEach(b => b.classList.remove("selected"));
@@ -1495,6 +1746,23 @@
     if (isSuccess) {
       startQuiz(currentSet.id);
     }
+  }
+
+  async function startMiniGameFromScore() {
+    const isSuccess = await processAutoSubmit();
+    if (isSuccess) {
+      showRootMaster();
+    }
+  }
+
+  function showRootMaster() {
+    document.getElementById("user-info-box").style.display = "none";
+    document.getElementById("menu-box").style.display = "none";
+    document.getElementById("quiz-box").style.display = "none";
+    document.getElementById("score-box").style.display = "none";
+    document.getElementById("root-master-box").style.display = "flex";
+
+    game.showScreen('rm-start-screen');
   }
 
   /* --- 計算用メモ機能 --- */
@@ -1633,6 +1901,280 @@
       resizeMemoCanvas();
     }
   });
+
+  /* --- ルートマスター（ミニゲーム）処理 --- */
+  function renderSqrtHTML(n) {
+    if (typeof katex !== 'undefined') {
+      return katex.renderToString(`\\sqrt{${n}}`, { throwOnError: false });
+    }
+    return `√${n}`;
+  }
+
+  function renderABHTML(a, b) {
+    if (typeof katex !== 'undefined') {
+      const prefix = a > 1 ? a : '';
+      return katex.renderToString(`${prefix}\\sqrt{${b}}`, { throwOnError: false });
+    }
+    return `${a > 1 ? a : ''}√${b}`;
+  }
+
+  const sound = {
+    ctx: null,
+    init() {
+      if (!this.ctx) {
+        this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+    },
+    playCorrect() {
+      if (!this.ctx) return;
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(587.33, this.ctx.currentTime);
+      osc.frequency.setValueAtTime(880, this.ctx.currentTime + 0.08);
+      gain.gain.setValueAtTime(0.2, this.ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.25);
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+      osc.start();
+      osc.stop(this.ctx.currentTime + 0.25);
+    },
+    playWrong() {
+      if (!this.ctx) return;
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(150, this.ctx.currentTime);
+      osc.frequency.setValueAtTime(120, this.ctx.currentTime + 0.1);
+      gain.gain.setValueAtTime(0.2, this.ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.3);
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+      osc.start();
+      osc.stop(this.ctx.currentTime + 0.3);
+    }
+  };
+
+  class QuestionGenerator {
+    constructor() {
+      this.baseRadicands = [2, 3, 5, 6, 7];
+      this.usedNums = new Set();
+      this.allPool = [];
+      this.initPool();
+    }
+
+    initPool() {
+      this.allPool = [];
+      for (let a = 2; a <= 5; a++) {
+        for (let b of this.baseRadicands) {
+          this.allPool.push({ a, b, targetNum: a * a * b });
+        }
+      }
+    }
+
+    resetUsed() {
+      this.usedNums.clear();
+    }
+
+    generate() {
+      // 利用可能な問題候補（出題済みの targetNum を除外）
+      let available = this.allPool.filter(item => !this.usedNums.has(item.targetNum));
+      
+      // もし全パターン出題し尽くした場合は履歴を一旦リセットして全プールから選択
+      if (available.length === 0) {
+        this.resetUsed();
+        available = [...this.allPool];
+      }
+
+      const picked = available[Math.floor(Math.random() * available.length)];
+      this.usedNums.add(picked.targetNum);
+
+      const a = picked.a;
+      const b = picked.b;
+      const originalVal = picked.targetNum;
+      const correctAnswer = { a, b };
+      const dummies = [];
+
+      while (dummies.length < 3) {
+        const dummyA = Math.floor(Math.random() * 5) + 1;
+        const dummyB = this.baseRadicands[Math.floor(Math.random() * this.baseRadicands.length)];
+        
+        if (dummyA * dummyA * dummyB !== originalVal && 
+            !dummies.some(d => d.a === dummyA && d.b === dummyB)) {
+          dummies.push({ a: dummyA, b: dummyB });
+        }
+      }
+
+      const options = [correctAnswer, ...dummies].sort(() => Math.random() - 0.5);
+
+      return {
+        targetNum: originalVal,
+        correct: correctAnswer,
+        options: options
+      };
+    }
+  }
+
+  class Game {
+    constructor() {
+      this.duration = 30;
+      this.timeLeft = 0;
+      this.score = 0;
+      this.combo = 0;
+      this.maxCombo = 0;
+      this.correctCount = 0;
+      this.timer = null;
+      this.currentQuestion = null;
+      this.history = [];
+      this.generator = new QuestionGenerator();
+
+      this.highScore = parseInt(localStorage.getItem('root_master_highscore') || '0', 10);
+      document.getElementById('rm-high-score').innerText = this.highScore;
+
+      document.getElementById('rm-title-ab').innerHTML = renderABHTML('a', 'b');
+    }
+
+    start() {
+      sound.init();
+      this.score = 0;
+      this.combo = 0;
+      this.maxCombo = 0;
+      this.correctCount = 0;
+      this.timeLeft = this.duration;
+      this.history = [];
+      this.generator.resetUsed(); // 新しいゲーム開始時に出題履歴をリセット
+
+      this.showScreen('rm-game-screen');
+      this.updateHeader();
+      this.nextQuestion();
+
+      const startTime = Date.now();
+      clearInterval(this.timer);
+      this.timer = setInterval(() => {
+        const elapsed = (Date.now() - startTime) / 1000;
+        this.timeLeft = Math.max(0, this.duration - elapsed);
+        
+        const percentage = (this.timeLeft / this.duration) * 100;
+        document.getElementById('rm-timer-bar').style.width = `${percentage}%`;
+
+        if (this.timeLeft <= 0) {
+          this.end();
+        }
+      }, 50);
+    }
+
+    nextQuestion() {
+      this.currentQuestion = this.generator.generate();
+      document.getElementById('rm-target-val').innerHTML = renderSqrtHTML(this.currentQuestion.targetNum);
+
+      const grid = document.getElementById('rm-options-grid');
+      grid.innerHTML = '';
+
+      this.currentQuestion.options.forEach(opt => {
+        const btn = document.createElement('button');
+        btn.className = 'rm-option-btn';
+        btn.innerHTML = renderABHTML(opt.a, opt.b);
+        btn.onclick = (e) => this.checkAnswer(opt, e.currentTarget);
+        grid.appendChild(btn);
+      });
+    }
+
+    checkAnswer(selected, element) {
+      const isCorrect = (selected.a === this.currentQuestion.correct.a && selected.b === this.currentQuestion.correct.b);
+      
+      const buttons = document.querySelectorAll('.rm-option-btn');
+      buttons.forEach(b => b.style.pointerEvents = 'none');
+
+      this.history.push({
+        target: this.currentQuestion.targetNum,
+        correct: this.currentQuestion.correct,
+        userSuccess: isCorrect
+      });
+
+      if (isCorrect) {
+        sound.playCorrect();
+        element.classList.add('correct');
+        this.showFeedback('⭕', '#10b981');
+        
+        this.combo++;
+        if (this.combo > this.maxCombo) this.maxCombo = this.combo;
+        this.correctCount++;
+        
+        const addedScore = 100 + (this.combo - 1) * 20;
+        this.score += addedScore;
+      } else {
+        sound.playWrong();
+        element.classList.add('wrong');
+        this.showFeedback('❌', '#ef4444');
+        
+        this.combo = 0;
+
+        const targetHTML = renderABHTML(this.currentQuestion.correct.a, this.currentQuestion.correct.b);
+        buttons.forEach(b => {
+          if (b.innerHTML === targetHTML) {
+            b.classList.add('correct');
+          }
+        });
+      }
+
+      this.updateHeader();
+
+      setTimeout(() => {
+        if (this.timeLeft > 0) {
+          this.nextQuestion();
+        }
+      }, 400);
+    }
+
+    showFeedback(symbol, color) {
+      const fb = document.getElementById('rm-feedback');
+      fb.innerText = symbol;
+      fb.style.color = color;
+      fb.classList.add('show');
+      setTimeout(() => fb.classList.remove('show'), 300);
+    }
+
+    updateHeader() {
+      document.getElementById('rm-score').innerText = this.score;
+      document.getElementById('rm-combo').innerText = this.combo;
+    }
+
+    end() {
+      clearInterval(this.timer);
+
+      if (this.score > this.highScore) {
+        this.highScore = this.score;
+        localStorage.setItem('root_master_highscore', this.highScore);
+        document.getElementById('rm-high-score').innerText = this.highScore;
+      }
+
+      document.getElementById('rm-final-score').innerText = `${this.score} pts`;
+      document.getElementById('rm-stat-correct').innerText = `${this.correctCount} 問`;
+      document.getElementById('rm-stat-max-combo').innerText = `${this.maxCombo} 回`;
+
+      const reviewList = document.getElementById('rm-review-list');
+      reviewList.innerHTML = '';
+      this.history.forEach((item, idx) => {
+        const row = document.createElement('div');
+        row.className = 'rm-review-item';
+        const icon = item.userSuccess ? '⭕' : '❌';
+        row.innerHTML = `
+          <span>${icon} Q${idx+1}. ${renderSqrtHTML(item.target)}</span>
+          <b>= ${renderABHTML(item.correct.a, item.correct.b)}</b>
+        `;
+        reviewList.appendChild(row);
+      });
+
+      this.showScreen('rm-result-screen');
+    }
+
+    showScreen(id) {
+      document.querySelectorAll('.rm-screen').forEach(s => s.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
+    }
+  }
+
+  const game = new Game();
 
   populateSelectOptions(); 
 

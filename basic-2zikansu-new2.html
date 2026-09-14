@@ -1,0 +1,1732 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>関数とグラフ 学習アプリ</title>
+  <!-- MathJax JS for Math Rendering -->
+  <script>
+    MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']]
+      },
+      svg: {
+        fontCache: 'global'
+      }
+    };
+  </script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+  
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', Meiryo, sans-serif;
+      background-color: #f4f7f6;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      padding: 20px;
+    }
+
+    .quiz-container {
+      background: white;
+      padding: 40px;
+      border-radius: 16px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+      width: 95%;
+      max-width: 1200px;
+      min-height: 85vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      text-align: center;
+      transition: all 0.3s ease;
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+    }
+
+    .quiz-container.split-layout {
+      max-width: 98vw;
+      width: 98vw;
+      padding: 20px;
+      min-height: auto;
+      height: auto;
+      justify-content: flex-start;
+      overflow-y: auto;
+    }
+
+    .split-wrapper {
+      display: flex;
+      flex-direction: row;
+      gap: 20px;
+      width: 100%;
+      height: 100%;
+      text-align: left;
+    }
+
+    .split-left {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+
+    .split-right {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      background: #fff;
+      border: 2px solid #ced4da;
+      border-radius: 12px;
+      overflow: hidden;
+      min-width: 0;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    }
+
+    @media (max-width: 1024px) {
+      body {
+        padding: 10px;
+        align-items: flex-start;
+      }
+      .quiz-container {
+        padding: 20px;
+        min-height: auto;
+      }
+      .quiz-container.split-layout {
+        max-width: 100%;
+        width: 100%;
+        padding: 15px;
+      }
+      .split-wrapper {
+        flex-direction: column;
+      }
+      .split-right {
+        height: 380px;
+        flex-shrink: 0;
+      }
+    }
+
+    .app-title { font-size: 32px; font-weight: bold; color: #2c3e50; margin-bottom: 12px; }
+    .app-subtitle { font-size: 18px; color: #6c757d; margin-bottom: 28px; }
+
+    .user-info-form { display: flex; flex-direction: column; gap: 18px; text-align: left; max-width: 600px; margin: 0 auto; width: 100%; }
+    .form-group-inline { display: flex; gap: 12px; }
+    .form-group-inline > div { flex: 1; }
+    .user-info-form label { font-size: 15px; font-weight: bold; color: #495057; display: block; margin-bottom: 6px; }
+    .user-info-form input, .user-info-form select { 
+      width: 100%; 
+      padding: 12px 14px; 
+      border: 1px solid #ced4da; 
+      border-radius: 8px; 
+      font-size: 18px; 
+      background-color: #fff;
+    }
+
+    .user-display-bar {
+      background-color: #eef6ff;
+      padding: 12px 20px;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: bold;
+      color: #007bff;
+      margin-bottom: 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .btn-edit-user { background: none; border: none; color: #6c757d; font-size: 14px; cursor: pointer; text-decoration: underline; }
+
+    .menu-section-title {
+      font-size: 20px;
+      font-weight: bold;
+      color: #343a40;
+      text-align: left;
+      margin: 24px 0 12px 0;
+      padding-left: 10px;
+      border-left: 5px solid #007bff;
+    }
+
+    .menu-list {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+    .menu-card {
+      background: #f8f9fa;
+      border: 2px solid #e9ecef;
+      border-radius: 12px;
+      padding: 20px 24px;
+      text-align: left;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .menu-card:hover {
+      background: #eef6ff;
+      border-color: #007bff;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 123, 255, 0.15);
+    }
+
+    .menu-card-title {
+      font-size: 20px;
+      font-weight: bold;
+      color: #2c3e50;
+    }
+    .menu-card-stats { text-align: right; display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
+    .menu-card-badge {
+      background: #007bff;
+      color: white;
+      font-size: 13px;
+      font-weight: bold;
+      padding: 4px 12px;
+      border-radius: 12px;
+      white-space: nowrap;
+    }
+    .menu-card-accuracy { font-size: 15px; font-weight: bold; color: #28a745; }
+
+    .quiz-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    .header-controls {
+      display: flex;
+      gap: 10px;
+    }
+    .question-number {
+      font-size: 18px;
+      color: #6c757d;
+      font-weight: 600;
+    }
+    .btn-small-menu {
+      background: #e9ecef;
+      color: #495057;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+    .btn-small-menu:hover { background: #dee2e6; }
+    
+    .btn-memo {
+      background: #17a2b8;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+    .btn-memo:hover { background: #138496; }
+    .btn-memo.active { background: #e0a800; color: #212529; }
+
+    .question-content {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      margin-bottom: 24px;
+    }
+    @media (max-width: 600px) {
+      .question-content {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+    }
+
+    .question-title {
+      flex: 1;
+      text-align: left !important;
+      font-size: 22px;
+      font-weight: bold;
+      color: #2c3e50;
+      line-height: 1.8;
+      word-break: break-word;
+    }
+
+    .question-figure {
+      flex-shrink: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: #fff;
+      padding: 10px;
+      border: 1px solid #dee2e6;
+      border-radius: 8px;
+    }
+    
+    .options-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    @media (max-width: 600px) {
+      .options-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+    .btn-option {
+      background-color: #f8f9fa;
+      border: 2px solid #e9ecef;
+      border-radius: 12px;
+      padding: 16px;
+      font-size: 18px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      color: #333;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 60px;
+      line-height: 1.4;
+    }
+    .btn-option:hover:not(:disabled) {
+      background-color: #e9ecef;
+      border-color: #4a90e2;
+    }
+    .btn-option:disabled {
+      cursor: default;
+      opacity: 0.85;
+    }
+    
+    .btn-option.correct-choice {
+      background-color: #d4edda !important;
+      border-color: #c3e6cb !important;
+      color: #155724 !important;
+    }
+    .btn-option.wrong-choice {
+      background-color: #f8d7da !important;
+      border-color: #f5c6cb !important;
+      color: #721c24 !important;
+    }
+
+    .graph-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 20px;
+      background: #fafafa;
+      padding: 15px;
+      border-radius: 12px;
+      border: 1px solid #e0e0e0;
+    }
+    .graph-instructions {
+      font-size: 15px;
+      font-weight: bold;
+      color: #007bff;
+      margin-bottom: 10px;
+    }
+    #graph-canvas {
+      background: #ffffff;
+      border: 2px solid #333;
+      cursor: pointer;
+      border-radius: 4px;
+      touch-action: none;
+    }
+    .graph-controls {
+      margin-top: 10px;
+      display: flex;
+      gap: 10px;
+    }
+    .btn-graph-action {
+      padding: 8px 16px;
+      background-color: #6c757d;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    .btn-graph-submit {
+      padding: 8px 20px;
+      background-color: #28a745;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    .btn-graph-submit:disabled {
+      background-color: #ccc;
+      cursor: not-allowed;
+    }
+
+    .result-section {
+      margin-top: 16px;
+      display: none;
+      text-align: left;
+      background-color: #f8f9fa;
+      padding: 20px;
+      border-radius: 12px;
+      border: 1px solid #e2e8f0;
+    }
+    .result-header {
+      font-size: 24px;
+      font-weight: bold;
+      margin-bottom: 12px;
+      text-align: center;
+    }
+    .correct { color: #28a745; }
+    .incorrect { color: #dc3545; }
+    
+    .explanation-box {
+      font-size: 16px;
+      color: #495057;
+      line-height: 1.8;
+    }
+    .explanation-title {
+      font-weight: bold;
+      color: #2c3e50;
+      margin-bottom: 8px;
+      border-bottom: 2px solid #007bff;
+      display: inline-block;
+      padding-bottom: 4px;
+    }
+
+    .reflection-box {
+      background: #f8f9fa;
+      border: 2px solid #e0e0e0;
+      border-radius: 12px;
+      padding: 20px;
+      margin: 20px 0;
+      text-align: left;
+    }
+    .reflection-title {
+      font-size: 18px;
+      font-weight: bold;
+      color: #2c3e50;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .reflection-rating {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+    .btn-rating {
+      flex: 1;
+      padding: 10px 4px;
+      border: 2px solid #ced4da;
+      background: #fff;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+      font-size: 14px;
+      color: #495057;
+      transition: all 0.2s ease;
+    }
+    .btn-rating:hover {
+      border-color: #007bff;
+      background: #eef6ff;
+    }
+    .btn-rating.selected {
+      background: #007bff;
+      color: white;
+      border-color: #007bff;
+    }
+    .reflection-textarea {
+      width: 100%;
+      height: 90px;
+      padding: 12px;
+      border: 1px solid #ced4da;
+      border-radius: 8px;
+      font-size: 15px;
+      resize: vertical;
+      font-family: inherit;
+    }
+    
+    .send-status { font-size: 15px; margin-top: 15px; color: #007bff; font-weight: bold; text-align: center; }
+
+    .btn-primary {
+      background-color: #007bff;
+      color: white;
+      border: none;
+      padding: 16px 32px;
+      border-radius: 8px;
+      font-size: 18px;
+      font-weight: bold;
+      cursor: pointer;
+      margin-top: 12px;
+      display: block;
+      transition: background-color 0.2s;
+      width: 100%;
+    }
+    .btn-primary:hover { background-color: #0056b3; }
+
+    .btn-danger {
+      background-color: #dc3545;
+      color: white;
+      border: none;
+      padding: 14px 28px;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      margin-top: 12px;
+      display: block;
+      transition: background-color 0.2s;
+      width: 100%;
+    }
+    .btn-danger:hover { background-color: #c82333; }
+
+    .memo-header {
+      padding: 10px 16px;
+      background: #2c3e50;
+      color: white;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .memo-title { font-weight: bold; font-size: 16px; }
+    .memo-toolbar {
+      padding: 8px;
+      background: #f1f3f5;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+      border-bottom: 1px solid #dee2e6;
+    }
+    .memo-toolbar button, .memo-toolbar select, .memo-toolbar input {
+      padding: 4px 8px;
+      border-radius: 6px;
+      border: 1px solid #ced4da;
+      background: white;
+      font-size: 13px;
+      cursor: pointer;
+    }
+    .memo-toolbar button.active {
+      background: #007bff;
+      color: white;
+      border-color: #007bff;
+    }
+    .memo-canvas-wrapper {
+      flex: 1;
+      position: relative;
+      background: #fdfdfd;
+      background-image: linear-gradient(#e5e5e5 1px, transparent 1px), linear-gradient(90deg, #e5e5e5 1px, transparent 1px);
+      background-size: 20px 20px;
+      touch-action: none;
+      min-height: 250px;
+    }
+    canvas#memo-canvas {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      cursor: crosshair; 
+    }
+  </style>
+</head>
+<body>
+
+<div class="quiz-container" id="main-container">
+  
+  <!-- 0. ユーザー情報入力画面 -->
+  <div id="user-info-box">
+    <div class="app-title">📝 初期設定</div>
+    <div class="app-subtitle">学習を開始する前に名前を入力してください</div>
+    
+    <form class="user-info-form" onsubmit="saveUserInfo(event)">
+      <div class="form-group-inline">
+        <div>
+          <label for="input-grade">年</label>
+          <select id="input-grade" required>
+            <option value="">選択</option>
+          </select>
+        </div>
+        <div>
+          <label for="input-class">組</label>
+          <select id="input-class" required>
+            <option value="">選択</option>
+          </select>
+        </div>
+        <div>
+          <label for="input-number">番号</label>
+          <select id="input-number" required>
+            <option value="">選択</option>
+          </select>
+        </div>
+      </div>
+      <div>
+        <label for="input-name">氏名</label>
+        <input type="text" id="input-name" placeholder="山田 太郎" required>
+      </div>
+      <button type="submit" class="btn-primary">学習を開始する</button>
+      <button type="button" class="btn-danger" onclick="resetAllData()">🔄 ユーザー情報・全解答履歴をリセット</button>
+    </form>
+  </div>
+
+  <!-- 1. メニュー画面 -->
+  <div id="menu-box" style="display: none;">
+    <div class="user-display-bar">
+      <span id="user-display-text"></span>
+      <button class="btn-edit-user" onclick="showUserInfoForm()">設定変更</button>
+    </div>
+    <div class="app-title">📐 関数とグラフ トレーニング</div>
+    <div class="app-subtitle">挑戦したい問題セットを選択してください</div>
+    
+    <div class="menu-section-title">📘 演習問題セット</div>
+    <div class="menu-list" id="menu-basic-container"></div>
+  </div>
+
+  <!-- 2. クイズ画面 -->
+  <div id="quiz-box" style="display: none;">
+    <div class="quiz-header">
+      <div class="question-number" id="q-num">第 1 問</div>
+      <div class="header-controls">
+        <button class="btn-memo" id="memo-toggle-btn" onclick="toggleMemoLayout()">✏️ 計算メモを表示</button>
+        <button class="btn-small-menu" onclick="showMenu()">メニューに戻る</button>
+      </div>
+    </div>
+
+    <div class="split-wrapper">
+      <div class="split-left">
+        <div class="question-content">
+          <div class="question-title" id="q-title">問題の読み込み中...</div>
+          <div class="question-figure" id="q-figure" style="display: none;"></div>
+        </div>
+        
+        <!-- 選択肢型領域 -->
+        <div class="options-grid" id="options-container"></div>
+        
+        <!-- グラフ作図型領域 -->
+        <div class="graph-container" id="graph-container" style="display: none;">
+          <div class="graph-instructions" id="graph-instruction-text">① タップしてください</div>
+          <canvas id="graph-canvas" width="360" height="360"></canvas>
+          <div class="graph-controls">
+            <button class="btn-graph-action" onclick="resetGraphSelection()">やり直す</button>
+            <button class="btn-graph-submit" id="btn-graph-submit" onclick="checkGraphAnswer()" disabled>判定する</button>
+          </div>
+        </div>
+
+        <div class="result-section" id="result-section">
+          <div class="result-header" id="result-text"></div>
+          <div class="explanation-box">
+            <div class="explanation-title">解説</div>
+            <div id="explanation-text"></div>
+          </div>
+          <button class="btn-primary" id="next-btn" onclick="nextQuestion()">次の問題へ</button>
+        </div>
+      </div>
+
+      <div class="split-right" id="memo-panel" style="display: none;">
+        <div class="memo-header">
+          <span class="memo-title">✏️ 計算スペース</span>
+        </div>
+        <div class="memo-toolbar">
+          <button id="tool-pen" class="active" onclick="setMemoMode('pen')">🖊️ ペン</button>
+          <button id="tool-eraser" onclick="setMemoMode('eraser')">🧹 消しゴム</button>
+          <label style="font-size: 12px;">色:
+            <input type="color" id="memo-color" value="#000000" onchange="updateMemoStyle()">
+          </label>
+          <label style="font-size: 12px;">太さ:
+            <select id="memo-size" onchange="updateMemoStyle()">
+              <option value="2">細い</option>
+              <option value="4" selected>普通</option>
+              <option value="8">太い</option>
+            </select>
+          </label>
+          <button onclick="clearMemoCanvas()" style="margin-left: auto; background-color: #f8d7da; color: #721c24;">🗑️ 全消去</button>
+        </div>
+        <div class="memo-canvas-wrapper" id="memo-canvas-wrapper">
+          <canvas id="memo-canvas"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. 結果発表画面 -->
+  <div id="score-box" style="display: none;">
+    <h2 style="color: #2c3e50; margin-top: 0;" id="score-title">🎉 全問終了 🎉</h2>
+    <div id="score-text" style="font-size: 26px; font-weight: bold; color: #007bff; margin: 20px 0 10px 0;"></div>
+    <div id="accuracy-text" style="font-size: 22px; font-weight: bold; color: #28a745; margin-bottom: 10px;"></div>
+    <div id="details-text" style="font-size: 20px; font-weight: bold; color: #495057; margin-bottom: 20px; letter-spacing: 2px;"></div>
+
+    <div class="reflection-box">
+      <div class="reflection-title">💭 学習の振り返り</div>
+      
+      <label style="font-size: 14px; font-weight: bold; color: #495057; display: block; margin-bottom: 8px;">1. 理解度を選んでください</label>
+      <div class="reflection-rating">
+        <button type="button" class="btn-rating" onclick="setRating(1, this)">1: 難しかった</button>
+        <button type="button" class="btn-rating" onclick="setRating(2, this)">2: 少し難しい</button>
+        <button type="button" class="btn-rating" onclick="setRating(3, this)">3: 普通</button>
+        <button type="button" class="btn-rating" onclick="setRating(4, this)">4: よく分かった</button>
+        <button type="button" class="btn-rating" onclick="setRating(5, this)">5: 完璧！</button>
+      </div>
+
+      <label for="reflection-comment" style="font-size: 14px; font-weight: bold; color: #495057; display: block; margin-bottom: 8px;">2. わかったこと・疑問点・感想などを自由に記入してください</label>
+      <textarea id="reflection-comment" class="reflection-textarea" placeholder="例：傾きと切片、または頂点と軸の関係がよくわかった。"></textarea>
+    </div>
+
+    <div class="send-status" id="send-status" style="display: none;"></div>
+
+    <div style="margin-top: 24px; max-width: 500px; margin-left: auto; margin-right: auto;">
+      <button class="btn-primary" onclick="restartQuiz()">もう一度解く</button>
+      <button class="btn-primary" onclick="showMenu()">メニュー画面に戻る</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  // Web App URLを以下に張り付けてください
+  const GAS_WEBAPP_URL = "https://script.google.com/macros/s/AKfycbz6eSmhdyxTzs4Sq9_aRkVOZ0oXdvlNj7CnuyVrk4ssR7Dqe6g6IWe7j4TCrl3kPgpWrg/exec";
+
+  // 年組番号から生徒IDを生成（例: 2年1組5番 -> "2105"）
+  function generateStudentId(grade, classNum, number) {
+    const g = String(grade);
+    const c = String(classNum);
+    const n = String(number).padStart(2, '0');
+    return `${g}${c}${n}`;
+  }
+
+  // 全画像を網羅した問題セット
+  const quizSets = [
+    {
+      id: "set-77-78",
+      title: "【問題77・78】1次関数のグラフ描画",
+      isSimilar: false,
+      questions: [
+        {
+          type: "graph-linear",
+          text: "【77(1)】<br>1次関数 $y = 3x - 2$ のグラフをかきなさい。<br>※まず<b>切片(y軸上の点)</b>をタップし、次に<b>直線が通るもう一点</b>をタップしてください。",
+          a: 3, b: -2,
+          explanation: "$y = 3x - 2$ は、傾き $3$、切片 $-2$ の直線です。<br>切片 $(0, -2)$ と、もう1点 $(1, 1)$ などを選びます。"
+        },
+        {
+          type: "graph-linear",
+          text: "【77(2)】<br>1次関数 $y = -2x + 2$ のグラフをかきなさい。<br>※まず<b>切片(y軸上の点)</b>をタップし、次に<b>直線が通るもう一点</b>をタップしてください。",
+          a: -2, b: 2,
+          explanation: "$y = -2x + 2$ は、傾き $-2$、切片 $2$ の直線です。<br>切片 $(0, 2)$ と、もう1点 $(1, 0)$ などを選びます。"
+        },
+        {
+          type: "graph-linear",
+          text: "【78(1)】<br>1次関数 $y = -x - 4$ のグラフをかきなさい。<br>※まず<b>切片(y軸上の点)</b>をタップし、次に<b>直線が通るもう一点</b>をタップしてください。",
+          a: -1, b: -4,
+          explanation: "$y = -x - 4$ は、傾き $-1$、切片 $-4$ の直線です。<br>切片 $(0, -4)$ と、もう1点 $(1, -5)$ や $(-1, -3)$ などを選びます。"
+        },
+        {
+          type: "graph-linear",
+          text: "【78(2)】<br>1次関数 $y = \\frac{1}{2}x + 1$ のグラフをかきなさい。<br>※まず<b>切片(y軸上の点)</b>をタップし、次に<b>直線が通るもう一点</b>をタップしてください。",
+          a: 0.5, b: 1,
+          explanation: "$y = \\frac{1}{2}x + 1$ は、傾き $\\frac{1}{2}$、切片 $1$ の直線です。<br>切片 $(0, 1)$ と、もう1点 $(2, 2)$ などを選びます。"
+        }
+      ]
+    },
+    {
+      id: "set-79-80",
+      title: "【問題79・80】1次関数とx軸・y軸との交点",
+      isSimilar: false,
+      questions: [
+        {
+          type: "choice",
+          text: "【79(1)】 $y = x - 3$ のグラフと $x$ 軸との交点の座標を求めなさい。",
+          correct: "$(3, 0)$",
+          dummy: ["$(-3, 0)$", "$(0, 3)$", "$(0, -3)$"],
+          explanation: "$x$ 軸との交点では $y = 0$ となるので、<br>$0 = x - 3 \\Rightarrow x = 3$<br>したがって、交点の座標は $(3, 0)$ です。"
+        },
+        {
+          type: "choice",
+          text: "【79(2)】 $y = 2x + 8$ のグラフと $x$ 軸との交点の座標を求めなさい。",
+          correct: "$(-4, 0)$",
+          dummy: ["$(4, 0)$", "$(0, 8)$", "$(0, -4)$"],
+          explanation: "$x$ 軸との交点では $y = 0$ となるので、<br>$0 = 2x + 8 \\Rightarrow 2x = -8 \\Rightarrow x = -4$<br>したがって、交点の座標は $(-4, 0)$ です。"
+        },
+        {
+          type: "choice",
+          text: "【79(3)】 $y = \\frac{1}{2}x - 5$ のグラフと $x$ 軸との交点の座標を求めなさい。",
+          correct: "$(10, 0)$",
+          dummy: ["$(5, 0)$", "$(-10, 0)$", "$(0, -5)$"],
+          explanation: "$x$ 軸との交点では $y = 0$ となるので、<br>$0 = \\frac{1}{2}x - 5 \\Rightarrow \\frac{1}{2}x = 5 \\Rightarrow x = 10$<br>したがって、交点の座標は $(10, 0)$ です。"
+        },
+        {
+          type: "choice",
+          text: "【80(1)】 $y = -x + 4$ のグラフと $y$ 軸との交点の座標を求めなさい。",
+          correct: "$(0, 4)$",
+          dummy: ["$(4, 0)$", "$(-4, 0)$", "$(0, -4)$"],
+          explanation: "$y$ 軸との交点では $x = 0$ となるので、<br>$y = -0 + 4 \\Rightarrow y = 4$<br>したがって、交点の座標は $(0, 4)$ です。"
+        },
+        {
+          type: "choice",
+          text: "【80(2)】 $y = -3x - 6$ のグラフと $y$ 軸との交点の座標を求めなさい。",
+          correct: "$(0, -6)$",
+          dummy: ["$(-2, 0)$", "$(0, 6)$", "$(2, 0)$"],
+          explanation: "$y$ 軸との交点では $x = 0$ となるので、<br>$y = -3(0) - 6 \\Rightarrow y = -6$<br>したがって、交点の座標は $(0, -6)$ です。"
+        },
+        {
+          type: "choice",
+          text: "【80(3)】 $y = -\\frac{2}{3}x + 6$ のグラフと $y$ 軸との交点の座標を求めなさい。",
+          correct: "$(0, 6)$",
+          dummy: ["$(9, 0)$", "$(0, -6)$", "$(-9, 0)$"],
+          explanation: "$y$ 軸との交点では $x = 0$ となるので、<br>$y = -\\frac{2}{3}(0) + 6 \\Rightarrow y = 6$<br>したがって、交点の座標は $(0, 6)$ です。"
+        }
+      ]
+    },
+    {
+      id: "set-82-84-86-88",
+      title: "【問題82,84,86,88】2次関数のグラフ描画(基本)",
+      isSimilar: false,
+      questions: [
+        {
+          type: "graph-quad",
+          text: "【82(1)】 $y = x^2$ のグラフをかきなさい。<br>※まず<b>頂点</b>をタップし、次に<b>グラフが通るもう一点</b>をタップしてください。",
+          a: 1, p: 0, q: 0,
+          explanation: "頂点は $(0, 0)$ です。もう1点として $(1, 1)$ や $(2, 4)$ などを選びます。"
+        },
+        {
+          type: "graph-quad",
+          text: "【82(2)】 $y = -\\frac{1}{2}x^2$ のグラフをかきなさい。<br>※まず<b>頂点</b>をタップし、次に<b>グラフが通るもう一点</b>をタップしてください。",
+          a: -0.5, p: 0, q: 0,
+          explanation: "頂点は $(0, 0)$ です。もう1点として $(2, -2)$ や $(-2, -2)$ などを選びます。"
+        },
+        {
+          type: "graph-quad",
+          text: "【84(1)】 $y = x^2 + 4$ のグラフをかきなさい。<br>※まず<b>頂点</b>をタップし、次に<b>グラフが通るもう一点</b>をタップしてください。",
+          a: 1, p: 0, q: 4,
+          explanation: "頂点は $(0, 4)$、軸は直線 $x=0$ です。<br>もう1点として $(1, 5)$ や $(-1, 5)$ などを選びます。"
+        },
+        {
+          type: "graph-quad",
+          text: "【84(2)】 $y = -2x^2 + 2$ のグラフをかきなさい。<br>※まず<b>頂点</b>をタップし、次に<b>グラフが通るもう一点</b>をタップしてください。",
+          a: -2, p: 0, q: 2,
+          explanation: "頂点は $(0, 2)$、軸は直線 $x=0$ です。<br>もう1点として $(1, 0)$ や $(-1, 0)$ などを選びます。"
+        },
+        {
+          type: "graph-quad",
+          text: "【86(1)】 $y = (x - 2)^2$ のグラフをかきなさい。<br>※まず<b>頂点</b>をタップし、次に<b>グラフが通るもう一点</b>をタップしてください。",
+          a: 1, p: 2, q: 0,
+          explanation: "頂点は $(2, 0)$、軸は直線 $x = 2$ です。<br>もう1点として $(3, 1)$ や $(1, 1)$ などを選びます。"
+        },
+        {
+          type: "graph-quad",
+          text: "【86(2)】 $y = -2(x + 1)^2$ のグラフをかきなさい。<br>※まず<b>頂点</b>をタップし、次に<b>グラフが通るもう一点</b>をタップしてください。",
+          a: -2, p: -1, q: 0,
+          explanation: "頂点は $(-1, 0)$、軸は直線 $x = -1$ です。<br>もう1点として $(0, -2)$ や $(-2, -2)$ などを選びます。"
+        },
+        {
+          type: "graph-quad",
+          text: "【88(1)】 $y = (x - 2)^2 - 5$ のグラフをかきなさい。<br>※まず<b>頂点</b>をタップし、次に<b>グラフが通るもう一点</b>をタップしてください。",
+          a: 1, p: 2, q: -5,
+          explanation: "頂点は $(2, -5)$、軸は直線 $x = 2$ です。<br>もう1点として $(3, -4)$ や $(1, -4)$ などを選びます。"
+        },
+        {
+          type: "graph-quad",
+          text: "【88(2)】 $y = -2(x + 2)^2 - 3$ のグラフをかきなさい。<br>※まず<b>頂点</b>をタップし、次に<b>グラフが通るもう一点</b>をタップしてください。",
+          a: -2, p: -2, q: -3,
+          explanation: "頂点は $(-2, -3)$、軸は直線 $x = -2$ です。<br>もう1点として $(-1, -5)$ や $(-3, -5)$ などを選びます。"
+        }
+      ]
+    },
+    {
+      id: "set-89-90",
+      title: "【問題89・90】平方完成 (a=1の場合)",
+      isSimilar: false,
+      questions: [
+        {
+          type: "choice",
+          text: "【89(1)】 次の2次関数を $y = (x - p)^2 + q$ の形に変形しなさい。<br>$y = x^2 - 6x$",
+          correct: "$y = (x - 3)^2 - 9$",
+          dummy: ["$y = (x - 3)^2 + 9$", "$y = (x - 6)^2 - 36$", "$y = (x + 3)^2 - 9$"],
+          explanation: "$y = x^2 - 6x = (x - 3)^2 - 3^2 = (x - 3)^2 - 9$"
+        },
+        {
+          type: "choice",
+          text: "【89(2)】 次の2次関数を $y = (x - p)^2 + q$ の形に変形しなさい。<br>$y = x^2 + 2x$",
+          correct: "$y = (x + 1)^2 - 1$",
+          dummy: ["$y = (x + 1)^2 + 1$", "$y = (x + 2)^2 - 4$", "$y = (x - 1)^2 - 1$"],
+          explanation: "$y = x^2 + 2x = (x + 1)^2 - 1^2 = (x + 1)^2 - 1$"
+        },
+        {
+          type: "choice",
+          text: "【89(3)】 次の2次関数を $y = (x - p)^2 + q$ の形に変形しなさい。<br>$y = x^2 + 8x$",
+          correct: "$y = (x + 4)^2 - 16$",
+          dummy: ["$y = (x + 4)^2 + 16$", "$y = (x + 8)^2 - 64$", "$y = (x - 4)^2 - 16$"],
+          explanation: "$y = x^2 + 8x = (x + 4)^2 - 4^2 = (x + 4)^2 - 16$"
+        },
+        {
+          type: "choice",
+          text: "【90(1)】 次の2次関数を $y = (x - p)^2 + q$ の形に変形しなさい。<br>$y = x^2 - 2x + 8$",
+          correct: "$y = (x - 1)^2 + 7$",
+          dummy: ["$y = (x - 1)^2 + 8$", "$y = (x - 1)^2 - 7$", "$y = (x + 1)^2 + 7$"],
+          explanation: "$y = (x - 1)^2 - 1 + 8 = (x - 1)^2 + 7$"
+        },
+        {
+          type: "choice",
+          text: "【90(2)】 次の2次関数を $y = (x - p)^2 + q$ の形に変形しなさい。<br>$y = x^2 - 10x + 12$",
+          correct: "$y = (x - 5)^2 - 13$",
+          dummy: ["$y = (x - 5)^2 + 12$", "$y = (x - 5)^2 - 25$", "$y = (x + 5)^2 - 13$"],
+          explanation: "$y = (x - 5)^2 - 25 + 12 = (x - 5)^2 - 13$"
+        },
+        {
+          type: "choice",
+          text: "【90(3)】 次の2次関数を $y = (x - p)^2 + q$ の形に変形しなさい。<br>$y = x^2 + 12x + 25$",
+          correct: "$y = (x + 6)^2 - 11$",
+          dummy: ["$y = (x + 6)^2 + 25$", "$y = (x + 6)^2 + 11$", "$y = (x - 6)^2 - 11$"],
+          explanation: "$y = (x + 6)^2 - 36 + 25 = (x + 6)^2 - 11$"
+        }
+      ]
+    },
+    {
+      id: "set-91-92",
+      title: "【問題91・92】2次関数のグラフ描画 (平方完成)",
+      isSimilar: false,
+      questions: [
+        {
+          type: "graph-quad",
+          text: "【91】 $y = x^2 - 2x + 2$ のグラフをかきなさい。<br>※平方完成すると $y = (x - 1)^2 + 1$ です。<br>※まず<b>頂点</b>をタップし、次に<b>グラフが通るもう一点</b>をタップしてください。",
+          a: 1, p: 1, q: 1,
+          explanation: "$y = (x - 1)^2 + 1$ より、頂点は $(1, 1)$、軸は直線 $x = 1$ です。<br>通る点として $(0, 2)$ や $(2, 2)$ などを選びます。"
+        },
+        {
+          type: "graph-quad",
+          text: "【92】 $y = x^2 + 6x + 5$ のグラフをかきなさい。<br>※平方完成すると $y = (x + 3)^2 - 4$ です。<br>※まず<b>頂点</b>をタップし、次に<b>グラフが通るもう一点</b>をタップしてください。",
+          a: 1, p: -3, q: -4,
+          explanation: "$y = (x + 3)^2 - 4$ より、頂点は $(-3, -4)$、軸は直線 $x = -3$ です。<br>通る点として $(-2, -3)$ や $(-4, -3)$ などを選びます。"
+        }
+      ]
+    },
+    {
+      id: "set-93-94",
+      title: "【問題93・94】平方完成 (a≠1の場合)",
+      isSimilar: false,
+      questions: [
+        {
+          type: "choice",
+          text: "【93(1)】 次の2次関数を $y = a(x - p)^2 + q$ の形に変形しなさい。<br>$y = 2x^2 + 8x - 1$",
+          correct: "$y = 2(x + 2)^2 - 9$",
+          dummy: ["$y = 2(x + 2)^2 - 1$", "$y = 2(x + 4)^2 - 9$", "$y = 2(x - 2)^2 - 9$"],
+          explanation: "$y = 2(x^2 + 4x) - 1 = 2\{(x + 2)^2 - 4\} - 1 = 2(x + 2)^2 - 8 - 1 = 2(x + 2)^2 - 9$"
+        },
+        {
+          type: "choice",
+          text: "【93(2)】 次の2次関数を $y = a(x - p)^2 + q$ の形に変形しなさい。<br>$y = 2x^2 - 4x + 7$",
+          correct: "$y = 2(x - 1)^2 + 5$",
+          dummy: ["$y = 2(x - 1)^2 + 7$", "$y = 2(x - 1)^2 + 3$", "$y = 2(x + 1)^2 + 5$"],
+          explanation: "$y = 2(x^2 - 2x) + 7 = 2\{(x - 1)^2 - 1\} + 7 = 2(x - 1)^2 - 2 + 7 = 2(x - 1)^2 + 5$"
+        },
+        {
+          type: "choice",
+          text: "【93(3)】 次の2次関数を $y = a(x - p)^2 + q$ の形に変形しなさい。<br>$y = 2x^2 - 16x + 20$",
+          correct: "$y = 2(x - 4)^2 - 12$",
+          dummy: ["$y = 2(x - 4)^2 + 20$", "$y = 2(x - 4)^2 - 16$", "$y = 2(x + 4)^2 - 12$"],
+          explanation: "$y = 2(x^2 - 8x) + 20 = 2\{(x - 4)^2 - 16\} + 20 = 2(x - 4)^2 - 32 + 20 = 2(x - 4)^2 - 12$"
+        },
+        {
+          type: "choice",
+          text: "【94(1)】 次の2次関数を $y = a(x - p)^2 + q$ の形に変形しなさい。<br>$y = -x^2 + 2x + 9$",
+          correct: "$y = -(x - 1)^2 + 10$",
+          dummy: ["$y = -(x - 1)^2 + 9$", "$y = -(x + 1)^2 + 10$", "$y = -(x - 1)^2 + 8$"],
+          explanation: "$y = -(x^2 - 2x) + 9 = -\{(x - 1)^2 - 1\} + 9 = -(x - 1)^2 + 1 + 9 = -(x - 1)^2 + 10$"
+        },
+        {
+          type: "choice",
+          text: "【94(2)】 次の2次関数を $y = a(x - p)^2 + q$ の形に変形しなさい。<br>$y = -x^2 + 8x - 3$",
+          correct: "$y = -(x - 4)^2 + 13$",
+          dummy: ["$y = -(x - 4)^2 - 3$", "$y = -(x - 4)^2 - 19$", "$y = -(x + 4)^2 + 13$"],
+          explanation: "$y = -(x^2 - 8x) - 3 = -\{(x - 4)^2 - 16\} - 3 = -(x - 4)^2 + 16 - 3 = -(x - 4)^2 + 13$"
+        },
+        {
+          type: "choice",
+          text: "【94(3)】 次の2次関数を $y = a(x - p)^2 + q$ の形に変形しなさい。<br>$y = -x^2 - 12x - 25$",
+          correct: "$y = -(x + 6)^2 + 11$",
+          dummy: ["$y = -(x + 6)^2 - 25$", "$y = -(x + 6)^2 - 61$", "$y = -(x - 6)^2 + 11$"],
+          explanation: "$y = -(x^2 + 12x) - 25 = -\{(x + 6)^2 - 36\} - 25 = -(x + 6)^2 + 36 - 25 = -(x + 6)^2 + 11$"
+        }
+      ]
+    },
+    {
+      id: "set-95-96",
+      title: "【問題95・96】2次関数のグラフ描画 (a≠1の一般形)",
+      isSimilar: false,
+      questions: [
+        {
+          type: "graph-quad",
+          text: "【95】 $y = 2x^2 - 4x + 3$ のグラフをかきなさい。<br>※まず<b>頂点</b>をタップし、次に<b>グラフが通るもう一点</b>をタップしてください。",
+          a: 2, p: 1, q: 1,
+          explanation: "$y = 2(x - 1)^2 + 1$ より、頂点は $(1, 1)$、軸は直線 $x = 1$ です。<br>通る点として $(2, 3)$ や $(0, 3)$ などを選びます。"
+        },
+        {
+          type: "graph-quad",
+          text: "【96】 $y = -x^2 - 6x - 4$ のグラフをかきなさい。<br>※まず<b>頂点</b>をタップし、次に<b>グラフが通るもう一点</b>をタップしてください。",
+          a: -1, p: -3, q: 5,
+          explanation: "$y = -(x + 3)^2 + 5$ より、頂点は $(-3, 5)$、軸は直線 $x = -3$ です。<br>通る点として $(-2, 4)$ や $(-4, 4)$ などを選びます。"
+        }
+      ]
+    },
+    {
+      id: "set-97-100",
+      title: "【問題97〜100】2次関数の最大値・最小値 (全領域)",
+      isSimilar: false,
+      questions: [
+        {
+          type: "choice",
+          text: "【97】 2次関数 $y = (x + 2)^2 - 1$ の最大値、最小値を求めなさい。",
+          correct: "最小値 $-1$ ($x = -2$), 最大値なし",
+          dummy: ["最大値 $-1$ ($x = -2$), 最小値なし", "最小値 $1$ ($x = 2$), 最大値なし", "最小値 $-1$ ($x = 2$), 最大値なし"],
+          explanation: "下に凸の放物線で、頂点は $(-2, -1)$ です。<br>$x = -2$ で最小値 $-1$ をとり、最大値はありません。"
+        },
+        {
+          type: "choice",
+          text: "【98】 2次関数 $y = -(x - 3)^2 + 4$ の最大値、最小値を求めなさい。",
+          correct: "最大値 $4$ ($x = 3$), 最小値なし",
+          dummy: ["最小値 $4$ ($x = 3$), 最大値なし", "最大値 $-4$ ($x = -3$), 最小値なし", "最大値 $4$ ($x = -3$), 最小値なし"],
+          explanation: "上に凸の放物線で、頂点は $(3, 4)$ です。<br>$x = 3$ で最大値 $4$ をとり、最小値はありません。"
+        },
+        {
+          type: "choice",
+          text: "【99】 2次関数 $y = x^2 + 2x - 1$ の最大値、最小値を求めなさい。",
+          correct: "最小値 $-2$ ($x = -1$), 最大値なし",
+          dummy: ["最小値 $-1$ ($x = -1$), 最大値なし", "最大値 $-2$ ($x = -1$), 最小値なし", "最小値 $-2$ ($x = 1$), 最大値なし"],
+          explanation: "平方完成すると $y = (x + 1)^2 - 2$ です。<br>下に凸の放物線なので、$x = -1$ で最小値 $-2$ をとり、最大値はありません。"
+        },
+        {
+          type: "choice",
+          text: "【100】 2次関数 $y = -x^2 + 4x - 3$ の最大値、最小値を求めなさい。",
+          correct: "最大値 $1$ ($x = 2$), 最小値なし",
+          dummy: ["最大値 $-3$ ($x = 2$), 最小値なし", "最小値 $1$ ($x = 2$), 最大値なし", "最大値 $1$ ($x = -2$), 最小値なし"],
+          explanation: "平方完成すると $y = -(x - 2)^2 + 1$ です。<br>上に凸の放物線なので、$x = 2$ で最大値 $1$ をとり、最小値はありません。"
+        }
+      ]
+    },
+    {
+      id: "set-101-102",
+      title: "【問題101・102】定義域のある2次関数の最大・最小",
+      isSimilar: false,
+      questions: [
+        {
+          type: "choice",
+          text: "【101】 2次関数 $y = x^2 - 2x - 1$ について、$0 \\leqq x \\leqq 3$ における最大値、最小値を求めなさい。",
+          correct: "最大値 $2$ ($x = 3$), 最小値 $-2$ ($x = 1$)",
+          dummy: ["最大値 $2$ ($x = 3$), 最小値 $-1$ ($x = 0$)", "最大値 $-1$ ($x = 0$), 最小値 $-2$ ($x = 1$)", "最大値 $3$ ($x = 3$), 最小値 $-2$ ($x = 1$)"],
+          explanation: "平方完成すると $y = (x - 1)^2 - 2$ で頂点は $(1, -2)$。<br>各点での値：<br>$x = 0 \\Rightarrow y = -1$<br>$x = 1 \\Rightarrow y = -2$ (最小)<br>$x = 3 \\Rightarrow y = 2$ (最大)<br>したがって、$x = 3$ で最大値 $2$、$x = 1$ で最小値 $-2$ です。"
+        },
+        {
+          type: "choice",
+          text: "【102】 2次関数 $y = x^2 - 6x + 7$ について、$4 \\leqq x \\leqq 6$ における最大値、最小値を求めなさい。",
+          correct: "最大値 $7$ ($x = 6$), 最小値 $-1$ ($x = 4$)",
+          dummy: ["最大値 $7$ ($x = 6$), 最小値 $-2$ ($x = 3$)", "最大値 $1$ ($x = 4$), 最小値 $-1$ ($x = 4$)", "最大値 $7$ ($x = 6$), 最小値 $0$ ($x = 4$)"],
+          explanation: "平方完成すると $y = (x - 3)^2 - 2$ で軸は $x = 3$。<br>定義域 $4 \\leqq x \\leqq 6$ は軸より右側にあるため、この範囲で単調増加します。<br>$x = 4 \\Rightarrow y = 4^2 - 24 + 7 = -1$ (最小)<br>$x = 6 \\Rightarrow y = 36 - 36 + 7 = 7$ (最大)<br>したがって、$x = 6$ で最大値 $7$、$x = 4$ で最小値 $-1$ です。"
+        }
+      ]
+    }
+  ];
+
+  let currentSet = null;
+  let currentQuestions = [];
+  let currentQIndex = 0;
+  let score = 0;
+  let userAnswers = []; 
+  let userInfo = { grade: "", classNum: "", number: "", name: "" };
+  let isMemoVisible = false;
+  let selectedRating = 0;
+
+  // グラフ作図用
+  let graphPoints = [];
+  let currentGraphQuestion = null;
+
+  function populateSelectOptions() {
+    const gradeSelect = document.getElementById("input-grade");
+    const classSelect = document.getElementById("input-class");
+    const numberSelect = document.getElementById("input-number");
+
+    gradeSelect.innerHTML = '<option value="">選択</option>';
+    classSelect.innerHTML = '<option value="">選択</option>';
+    numberSelect.innerHTML = '<option value="">選択</option>';
+
+    for (let i = 1; i <= 3; i++) {
+      const opt = document.createElement("option");
+      opt.value = i;
+      opt.textContent = i;
+      gradeSelect.appendChild(opt);
+    }
+
+    for (let i = 1; i <= 4; i++) {
+      const opt = document.createElement("option");
+      opt.value = i;
+      opt.textContent = i;
+      classSelect.appendChild(opt);
+    }
+
+    for (let i = 1; i <= 40; i++) {
+      const opt = document.createElement("option");
+      opt.value = i;
+      opt.textContent = i;
+      numberSelect.appendChild(opt);
+    }
+  }
+
+  function loadUserInfo() {
+    const saved = localStorage.getItem("mathQuizUserInfo");
+    if (saved) {
+      userInfo = JSON.parse(saved);
+      if (userInfo.grade && userInfo.classNum && userInfo.number && userInfo.name) {
+        document.getElementById("input-grade").value = userInfo.grade;
+        document.getElementById("input-class").value = userInfo.classNum;
+        document.getElementById("input-number").value = userInfo.number;
+        document.getElementById("input-name").value = userInfo.name;
+        updateUserDisplayBar();
+        return true;
+      }
+    }
+    return false;
+  }
+
+  function saveUserInfo(e) {
+    e.preventDefault();
+    userInfo.grade = document.getElementById("input-grade").value;
+    userInfo.classNum = document.getElementById("input-class").value;
+    userInfo.number = document.getElementById("input-number").value;
+    userInfo.name = document.getElementById("input-name").value.trim();
+
+    localStorage.setItem("mathQuizUserInfo", JSON.stringify(userInfo));
+    updateUserDisplayBar();
+    showMenu();
+  }
+
+  function resetAllData() {
+    if (confirm("名前・学年組情報およびすべての解答履歴を削除して初期化しますか？")) {
+      localStorage.clear();
+      userInfo = { grade: "", classNum: "", number: "", name: "" };
+      document.getElementById("input-grade").value = "";
+      document.getElementById("input-class").value = "";
+      document.getElementById("input-number").value = "";
+      document.getElementById("input-name").value = "";
+      alert("データをすべてリセットしました。");
+      showUserInfoForm();
+    }
+  }
+
+  function updateUserDisplayBar() {
+    const textEl = document.getElementById("user-display-text");
+    const studentId = generateStudentId(userInfo.grade, userInfo.classNum, userInfo.number);
+    textEl.textContent = `👤 ${userInfo.grade}年 ${userInfo.classNum}組 ${userInfo.number}番 (ID: ${studentId})  ${userInfo.name} さん`;
+  }
+
+  function showUserInfoForm() {
+    document.getElementById("user-info-box").style.display = "block";
+    document.getElementById("menu-box").style.display = "none";
+    document.getElementById("quiz-box").style.display = "none";
+    document.getElementById("score-box").style.display = "none";
+  }
+
+  function renderMath() {
+    if (window.MathJax) {
+      MathJax.typesetPromise();
+    }
+  }
+
+  function getAccuracyRecord(setId) {
+    const saved = localStorage.getItem(`accuracy_${setId}`);
+    return saved !== null ? saved : null;
+  }
+
+  function saveAccuracyRecord(setId, accuracyRate) {
+    localStorage.setItem(`accuracy_${setId}`, accuracyRate);
+  }
+
+  function showMenu() {
+    if (document.getElementById("score-box").style.display !== "none") {
+      const isSuccess = processAutoSubmit();
+      if (!isSuccess) return;
+    }
+
+    document.getElementById("user-info-box").style.display = "none";
+    document.getElementById("menu-box").style.display = "block";
+    document.getElementById("quiz-box").style.display = "none";
+    document.getElementById("score-box").style.display = "none";
+
+    const basicContainer = document.getElementById("menu-basic-container");
+    basicContainer.innerHTML = "";
+
+    quizSets.forEach(set => {
+      const card = document.createElement("div");
+      card.className = "menu-card";
+
+      const acc = getAccuracyRecord(set.id);
+      const accText = acc !== null ? `正答率: ${acc}%` : "未回答";
+
+      card.innerHTML = `
+        <div>
+          <div class="menu-card-title">${set.title}</div>
+        </div>
+        <div class="menu-card-stats">
+          <span class="menu-card-badge">${set.questions.length}問</span>
+          <span class="menu-card-accuracy">${accText}</span>
+        </div>
+      `;
+      card.onclick = () => startQuiz(set.id);
+      basicContainer.appendChild(card);
+    });
+
+    renderMath();
+  }
+
+  function startQuiz(setId) {
+    currentSet = quizSets.find(s => s.id === setId);
+    currentQuestions = [...currentSet.questions];
+    currentQIndex = 0;
+    score = 0;
+    userAnswers = [];
+
+    document.getElementById("menu-box").style.display = "none";
+    document.getElementById("quiz-box").style.display = "block";
+    document.getElementById("score-box").style.display = "none";
+
+    isMemoVisible = false;
+    updateMemoVisibility();
+
+    showQuestion();
+  }
+
+  function showQuestion() {
+    document.getElementById("result-section").style.display = "none";
+    clearMemoCanvas();
+
+    const q = currentQuestions[currentQIndex];
+    document.getElementById("q-num").textContent = `第 ${currentQIndex + 1} 問 / 全 ${currentQuestions.length} 問`;
+    
+    const titleEl = document.getElementById("q-title");
+    titleEl.innerHTML = q.text;
+
+    const figEl = document.getElementById("q-figure");
+    if (q.figure) {
+      figEl.innerHTML = q.figure;
+      figEl.style.display = "flex";
+    } else {
+      figEl.innerHTML = "";
+      figEl.style.display = "none";
+    }
+
+    const optionsContainer = document.getElementById("options-container");
+    const graphContainer = document.getElementById("graph-container");
+
+    if (q.type === "choice") {
+      optionsContainer.style.display = "grid";
+      graphContainer.style.display = "none";
+      optionsContainer.innerHTML = "";
+
+      let choices = [
+        { text: q.correct, isCorrect: true },
+        ...q.dummy.map(d => ({ text: d, isCorrect: false }))
+      ];
+      choices.sort(() => Math.random() - 0.5);
+
+      choices.forEach(choice => {
+        const btn = document.createElement("button");
+        btn.className = "btn-option";
+        btn.innerHTML = choice.text;
+        btn.onclick = () => checkAnswer(choice.isCorrect, btn, q);
+        optionsContainer.appendChild(btn);
+      });
+    } else if (q.type === "graph-linear" || q.type === "graph-quad") {
+      optionsContainer.style.display = "none";
+      graphContainer.style.display = "flex";
+      currentGraphQuestion = q;
+      initGraphCanvas();
+    }
+
+    renderMath();
+  }
+
+  /* --- グラフ作図機能 --- */
+  const gridRange = 6;
+  let gCanvas, gCtx;
+
+  function initGraphCanvas() {
+    gCanvas = document.getElementById("graph-canvas");
+    gCtx = gCanvas.getContext("2d");
+    resetGraphSelection();
+    gCanvas.onclick = handleGraphClick;
+  }
+
+  function resetGraphSelection() {
+    graphPoints = [];
+    const q = currentGraphQuestion;
+    if (q.type === "graph-linear") {
+      document.getElementById("graph-instruction-text").textContent = "① 切片 (y軸上の点) をタップしてください";
+    } else {
+      document.getElementById("graph-instruction-text").textContent = "① 頂点をタップしてください";
+    }
+    document.getElementById("btn-graph-submit").disabled = true;
+    drawGraphGrid();
+  }
+
+  function drawGraphGrid() {
+    const w = gCanvas.width;
+    const h = gCanvas.height;
+    const step = w / (gridRange * 2);
+
+    gCtx.clearRect(0, 0, w, h);
+
+    // グリッド線
+    gCtx.strokeStyle = "#e0e0e0";
+    gCtx.lineWidth = 1;
+    for (let i = 0; i <= gridRange * 2; i++) {
+      gCtx.beginPath();
+      gCtx.moveTo(i * step, 0);
+      gCtx.lineTo(i * step, h);
+      gCtx.stroke();
+
+      gCtx.beginPath();
+      gCtx.moveTo(0, i * step);
+      gCtx.lineTo(w, i * step);
+      gCtx.stroke();
+    }
+
+    const originX = w / 2;
+    const originY = h / 2;
+
+    // 軸
+    gCtx.strokeStyle = "#333333";
+    gCtx.lineWidth = 2;
+
+    gCtx.beginPath();
+    gCtx.moveTo(0, originY);
+    gCtx.lineTo(w, originY);
+    gCtx.stroke();
+
+    gCtx.beginPath();
+    gCtx.moveTo(originX, 0);
+    gCtx.lineTo(originX, h);
+    gCtx.stroke();
+
+    gCtx.fillStyle = "#333";
+    gCtx.font = "12px sans-serif";
+    gCtx.textAlign = "center";
+    gCtx.textBaseline = "top";
+    gCtx.fillText("1", originX + step, originY + 4);
+    gCtx.fillText("-1", originX - step, originY + 4);
+    gCtx.fillText("O", originX - 10, originY + 4);
+
+    gCtx.textAlign = "right";
+    gCtx.textBaseline = "middle";
+    gCtx.fillText("1", originX - 4, originY - step);
+    gCtx.fillText("-1", originX - 4, originY + step);
+
+    // 点の描画
+    graphPoints.forEach((p, idx) => {
+      const cx = originX + p.x * step;
+      const cy = originY - p.y * step;
+
+      gCtx.fillStyle = idx === 0 ? "#dc3545" : "#007bff";
+      gCtx.beginPath();
+      gCtx.arc(cx, cy, 6, 0, Math.PI * 2);
+      gCtx.fill();
+    });
+
+    // 線の描画
+    if (graphPoints.length === 2) {
+      const p1 = graphPoints[0];
+      const p2 = graphPoints[1];
+      const q = currentGraphQuestion;
+
+      gCtx.strokeStyle = "#007bff";
+      gCtx.lineWidth = 3;
+      gCtx.beginPath();
+
+      if (q.type === "graph-linear") {
+        const dx = p2.x - p1.x;
+        const dy = p2.y - p1.y;
+
+        if (dx === 0) {
+          const cx = originX + p1.x * step;
+          gCtx.moveTo(cx, 0);
+          gCtx.lineTo(cx, h);
+        } else {
+          const slope = dy / dx;
+          const intercept = p1.y - slope * p1.x;
+          const xMin = -gridRange;
+          const xMax = gridRange;
+          const y1 = slope * xMin + intercept;
+          const y2 = slope * xMax + intercept;
+
+          gCtx.moveTo(originX + xMin * step, originY - y1 * step);
+          gCtx.lineTo(originX + xMax * step, originY - y2 * step);
+        }
+      } else if (q.type === "graph-quad") {
+        const dx = p2.x - p1.x;
+        const dy = p2.y - p1.y;
+        if (dx !== 0) {
+          const coeff = dy / (dx * dx);
+          let first = true;
+          for (let px = -gridRange; px <= gridRange; px += 0.1) {
+            const py = coeff * Math.pow(px - p1.x, 2) + p1.y;
+            const cx = originX + px * step;
+            const cy = originY - py * step;
+            if (first) {
+              gCtx.moveTo(cx, cy);
+              first = false;
+            } else {
+              gCtx.lineTo(cx, cy);
+            }
+          }
+        }
+      }
+      gCtx.stroke();
+    }
+  }
+
+  function handleGraphClick(e) {
+    if (graphPoints.length >= 2) return;
+
+    const rect = gCanvas.getBoundingClientRect();
+    const clickX = e.clientX - rect.left;
+    const clickY = e.clientY - rect.top;
+
+    const w = gCanvas.width;
+    const h = gCanvas.height;
+    const step = w / (gridRange * 2);
+    const originX = w / 2;
+    const originY = h / 2;
+
+    const mathX = Math.round((clickX - originX) / step);
+    const mathY = Math.round((originY - clickY) / step);
+    const q = currentGraphQuestion;
+
+    if (graphPoints.length === 0) {
+      if (q.type === "graph-linear" && mathX !== 0) {
+        alert("1点目はy軸上の『切片』(x=0 の点)を選択してください。");
+        return;
+      }
+      graphPoints.push({ x: mathX, y: mathY });
+      document.getElementById("graph-instruction-text").textContent = "② グラフが通るもう一点をタップしてください";
+    } else if (graphPoints.length === 1) {
+      if (mathX === graphPoints[0].x && mathY === graphPoints[0].y) return;
+      graphPoints.push({ x: mathX, y: mathY });
+      document.getElementById("graph-instruction-text").textContent = "「判定する」ボタンを押してください";
+      document.getElementById("btn-graph-submit").disabled = false;
+    }
+
+    drawGraphGrid();
+  }
+
+  function checkGraphAnswer() {
+    const q = currentGraphQuestion;
+    const p1 = graphPoints[0];
+    const p2 = graphPoints[1];
+    let isCorrect = false;
+
+    if (q.type === "graph-linear") {
+      const isCorrectIntercept = (p1.x === 0 && p1.y === q.b);
+      const calculatedSlope = (p2.y - p1.y) / (p2.x - p1.x);
+      const isCorrectSlope = Math.abs(calculatedSlope - q.a) < 0.0001;
+      isCorrect = isCorrectIntercept && isCorrectSlope;
+    } else if (q.type === "graph-quad") {
+      const isCorrectVertex = (p1.x === q.p && p1.y === q.q);
+      const expectedY = q.a * Math.pow(p2.x - q.p, 2) + q.q;
+      const isCorrectPoint = Math.abs(p2.y - expectedY) < 0.0001;
+      isCorrect = isCorrectVertex && isCorrectPoint;
+    }
+
+    userAnswers.push({
+      qIndex: currentQIndex + 1,
+      isCorrect: isCorrect
+    });
+
+    if (isCorrect) {
+      score++;
+      document.getElementById("result-text").textContent = "⭕️ 正解！";
+      document.getElementById("result-text").className = "result-header correct";
+    } else {
+      document.getElementById("result-text").textContent = "❌ 不正解...";
+      document.getElementById("result-text").className = "result-header incorrect";
+    }
+
+    document.getElementById("explanation-text").innerHTML = q.explanation;
+    document.getElementById("result-section").style.display = "block";
+    renderMath();
+  }
+
+  function checkAnswer(isCorrect, selectedBtn, questionObj) {
+    const buttons = document.querySelectorAll(".btn-option");
+    buttons.forEach(btn => btn.disabled = true);
+
+    userAnswers.push({
+      qIndex: currentQIndex + 1,
+      isCorrect: isCorrect
+    });
+
+    if (isCorrect) {
+      score++;
+      selectedBtn.classList.add("correct-choice");
+      document.getElementById("result-text").textContent = "⭕️ 正解！";
+      document.getElementById("result-text").className = "result-header correct";
+    } else {
+      selectedBtn.classList.add("wrong-choice");
+      document.getElementById("result-text").textContent = "❌ 不正解...";
+      document.getElementById("result-text").className = "result-header incorrect";
+      
+      buttons.forEach(btn => {
+        if (btn.innerHTML.trim() === questionObj.correct.trim()) {
+          btn.classList.add("correct-choice");
+        }
+      });
+    }
+
+    document.getElementById("explanation-text").innerHTML = questionObj.explanation;
+    document.getElementById("result-section").style.display = "block";
+    renderMath();
+  }
+
+  function nextQuestion() {
+    currentQIndex++;
+    if (currentQIndex < currentQuestions.length) {
+      showQuestion();
+    } else {
+      showScore();
+    }
+  }
+
+  function setRating(val, btn) {
+    selectedRating = val;
+    document.querySelectorAll(".btn-rating").forEach(b => b.classList.remove("selected"));
+    btn.classList.add("selected");
+  }
+
+  function showScore() {
+    document.getElementById("quiz-box").style.display = "none";
+    document.getElementById("score-box").style.display = "block";
+
+    const total = currentQuestions.length;
+    const accuracyRate = Math.round((score / total) * 100);
+
+    saveAccuracyRecord(currentSet.id, accuracyRate);
+
+    let answerDetailsStr = userAnswers.map(a => a.isCorrect ? "○" : "×").join("");
+
+    document.getElementById("score-title").textContent = `🎉 「${currentSet.title}」 終了 🎉`;
+    document.getElementById("score-text").textContent = `${total} 問中 ${score} 問 正解！`;
+    document.getElementById("accuracy-text").textContent = `正答率: ${accuracyRate}%`;
+    document.getElementById("details-text").textContent = `結果: ${answerDetailsStr}`;
+
+    selectedRating = 0;
+    document.querySelectorAll(".btn-rating").forEach(b => b.classList.remove("selected"));
+    document.getElementById("reflection-comment").value = "";
+    
+    const statusEl = document.getElementById("send-status");
+    statusEl.style.display = "none";
+    statusEl.textContent = "";
+
+    renderMath();
+  }
+
+  function processAutoSubmit() {
+    const comment = document.getElementById("reflection-comment").value.trim();
+    
+    if (selectedRating === 0 || comment === "") {
+      alert("振り返り項目（理解度とコメント）を入力してください。");
+      return false;
+    }
+
+    const total = currentQuestions.length;
+    const accuracyRate = Math.round((score / total) * 100);
+    let answerDetailsStr = userAnswers.map(a => a.isCorrect ? "○" : "×").join("");
+
+    sendDataToTeacher(currentSet.id, currentSet.title, score, total, accuracyRate, answerDetailsStr, selectedRating, comment);
+    return true;
+  }
+
+  function sendDataToTeacher(setId, setTitle, score, total, accuracy, details, rating, comment) {
+    if (!GAS_WEBAPP_URL) return;
+
+    const studentId = generateStudentId(userInfo.grade, userInfo.classNum, userInfo.number);
+
+    const payload = {
+      studentId: studentId,
+      grade: parseInt(userInfo.grade, 10),
+      classNum: parseInt(userInfo.classNum, 10),
+      number: parseInt(userInfo.number, 10),
+      name: userInfo.name,
+      setId: setId,
+      setTitle: setTitle,
+      score: score,
+      total: total,
+      accuracy: accuracy,
+      details: details,
+      rating: rating,
+      comment: comment
+    };
+
+    fetch(GAS_WEBAPP_URL, {
+      method: "POST",
+      mode: "no-cors",
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
+      body: JSON.stringify(payload)
+    })
+    .catch(err => {
+      console.error("送信エラー:", err);
+    });
+  }
+
+  function restartQuiz() {
+    const isSuccess = processAutoSubmit();
+    if (isSuccess) {
+      startQuiz(currentSet.id);
+    }
+  }
+
+  /* --- 計算用メモ機能 --- */
+  let memoCanvas = document.getElementById("memo-canvas");
+  let memoCtx = memoCanvas.getContext("2d");
+  let isDrawing = false;
+  let memoMode = 'pen';
+  let lastX = 0;
+  let lastY = 0;
+
+  function toggleMemoLayout() {
+    isMemoVisible = !isMemoVisible;
+    updateMemoVisibility();
+  }
+
+  function updateMemoVisibility() {
+    const mainContainer = document.getElementById("main-container");
+    const memoPanel = document.getElementById("memo-panel");
+    const toggleBtn = document.getElementById("memo-toggle-btn");
+
+    if (isMemoVisible) {
+      mainContainer.classList.add("split-layout");
+      memoPanel.style.display = "flex";
+      toggleBtn.textContent = "✏️ 計算メモを隠す";
+      toggleBtn.classList.add("active");
+      setTimeout(resizeMemoCanvas, 50);
+    } else {
+      mainContainer.classList.remove("split-layout");
+      memoPanel.style.display = "none";
+      toggleBtn.textContent = "✏️ 計算メモを表示";
+      toggleBtn.classList.remove("active");
+    }
+  }
+
+  function resizeMemoCanvas() {
+    const wrapper = document.getElementById("memo-canvas-wrapper");
+    if (!wrapper || wrapper.clientWidth === 0) return;
+
+    if (memoCanvas.width !== wrapper.clientWidth || memoCanvas.height !== wrapper.clientHeight) {
+      const tempCanvas = document.createElement("canvas");
+      tempCanvas.width = memoCanvas.width;
+      tempCanvas.height = memoCanvas.height;
+      const tempCtx = tempCanvas.getContext("2d");
+      tempCtx.drawImage(memoCanvas, 0, 0);
+
+      memoCanvas.width = wrapper.clientWidth;
+      memoCanvas.height = wrapper.clientHeight;
+
+      memoCtx.drawImage(tempCanvas, 0, 0);
+      updateMemoStyle();
+    }
+  }
+
+  function setMemoMode(mode) {
+    memoMode = mode;
+    document.getElementById("tool-pen").classList.toggle("active", mode === 'pen');
+    document.getElementById("tool-eraser").classList.toggle("active", mode === 'eraser');
+    updateMemoStyle();
+  }
+
+  function updateMemoStyle() {
+    memoCtx.lineCap = "round";
+    memoCtx.lineJoin = "round";
+    const size = document.getElementById("memo-size").value;
+    
+    if (memoMode === 'eraser') {
+      memoCtx.globalCompositeOperation = "destination-out";
+      memoCtx.lineWidth = size * 4;
+    } else {
+      memoCtx.globalCompositeOperation = "source-over";
+      memoCtx.strokeStyle = document.getElementById("memo-color").value;
+      memoCtx.lineWidth = size;
+    }
+  }
+
+  function clearMemoCanvas() {
+    memoCtx.clearRect(0, 0, memoCanvas.width, memoCanvas.height);
+  }
+
+  function getCanvasPos(e) {
+    const rect = memoCanvas.getBoundingClientRect();
+    let clientX = e.clientX;
+    let clientY = e.clientY;
+
+    if (e.touches && e.touches.length > 0) {
+      clientX = e.touches[0].clientX;
+      clientY = e.touches[0].clientY;
+    }
+
+    const scaleX = memoCanvas.width / rect.width;
+    const scaleY = memoCanvas.height / rect.height;
+
+    return {
+      x: (clientX - rect.left) * scaleX,
+      y: (clientY - rect.top) * scaleY
+    };
+  }
+
+  function startDrawing(e) {
+    isDrawing = true;
+    const pos = getCanvasPos(e);
+    lastX = pos.x;
+    lastY = pos.y;
+  }
+
+  function draw(e) {
+    if (!isDrawing) return;
+    e.preventDefault();
+
+    const pos = getCanvasPos(e);
+
+    memoCtx.beginPath();
+    memoCtx.moveTo(lastX, lastY);
+    memoCtx.lineTo(pos.x, pos.y);
+    memoCtx.stroke();
+
+    lastX = pos.x;
+    lastY = pos.y;
+  }
+
+  function stopDrawing() {
+    isDrawing = false;
+  }
+
+  memoCanvas.addEventListener("mousedown", startDrawing);
+  memoCanvas.addEventListener("mousemove", draw);
+  memoCanvas.addEventListener("mouseup", stopDrawing);
+  memoCanvas.addEventListener("mouseout", stopDrawing);
+
+  memoCanvas.addEventListener("touchstart", startDrawing, { passive: false });
+  memoCanvas.addEventListener("touchmove", draw, { passive: false });
+  memoCanvas.addEventListener("touchend", stopDrawing);
+
+  window.addEventListener("resize", () => {
+    if (isMemoVisible) {
+      resizeMemoCanvas();
+    }
+  });
+
+  populateSelectOptions(); 
+
+  if (loadUserInfo()) {
+    showMenu();
+  } else {
+    showUserInfoForm();
+  }
+</script>
+
+</body>
+</html>
